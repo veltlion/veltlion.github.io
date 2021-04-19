@@ -1,0 +1,878 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Sora</title>
+  
+  
+  <link href="https://veltlion.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://veltlion.github.io/"/>
+  <updated>2020-08-30T04:07:37.000Z</updated>
+  <id>https://veltlion.github.io/</id>
+  
+  <author>
+    <name>空</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>导出 Valine 评论到 Disqus</title>
+    <link href="https://veltlion.github.io/valine-to-wxr/"/>
+    <id>https://veltlion.github.io/valine-to-wxr/</id>
+    <published>2019-07-03T00:07:12.000Z</published>
+    <updated>2020-08-30T04:07:37.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>　请所有用户在 6/25-7/25 期间尽快完成实名认证，对于未进行实名认证的账户，我们将禁止其创建或者激活应用，并禁止应用转移以及数据导入导出等操作，应用内具体的 API 请求不受影响；认证过渡期后我们会完全停止为尚未提交认证信息的账户提供服务。</p></blockquote><p>　　最近 LeanCloud 要实名才给用了，国际版也要验证手机号。可是本萌妹偏偏就不想实名，所以就只好放弃这个评论框了。好久没 po 文好不容易 po 一篇居然是这种……</p><span id="more"></span><h2 id="评论导出"><a href="#评论导出" class="headerlink" title="评论导出"></a>评论导出</h2><p>　　现在 LeanCloud 后台已经禁止数据导出了，但是并没有禁止 API 请求，可以用 <a href="https://leancloud.cn/dashboard/apionline/index.html">LeanCloud  API 在线测试工具</a> 把评论导出来。不过到 7/25 之后就完全不给用了，所以要趁早。</p><h2 id="评论转换"><a href="#评论转换" class="headerlink" title="评论转换"></a>评论转换</h2><p>　　搜了搜没有找到现成的转换工具，只好自己硬着头皮鼓捣了。</p><p>　　下面是把 Valine 评论数据转换成 Disqus 可导入的 WordPress WXR 格式的脚本。（需要安装 jq 和 curl</p><p>　　用法：</p><p>　　<code>valine-to-wxr.sh commentfile site</code></p><p>　　像我就是：</p><p>　　<code>valine-to-wxr.sh comment.json https://veltlion.github.io</code></p><p>　　因为 WordPress 的 WXR 格式需要文章标题，所以需要网址联网获取。但是不填好像也能导入，比如它也需要文章内容，我没填也正常导入了。</p><p>　　转换完之后到 <a href="https://import.disqus.com/">https://import.disqus.com</a> 导入就好了。</p><div class="tip">如果之前是从别的评论框转到 Valine ，记得先把之前导入到 Valine 的评论日期改回正确的。</div><h2 id="Disqus-不好用了"><a href="#Disqus-不好用了" class="headerlink" title="Disqus 不好用了"></a>Disqus 不好用了</h2><p>　　导入后评论者的头像都没有了，中文的标点符号也都变成英文的了，而且有些中文 url 文章下的评论也没有显示，但这都不是主要的。</p><p>　　现在 Disqus 的后台把评论者的 Email 和 IP 都打码了，导出的评论中没有评论者的 Email 和 IP 信息，也没有之前导入的评论。这样以后如果要换到其他评论框的话，这些评论都不能通过 Email 获取评论者的 Gravatar 头像。</p><p>　　还是不用 Disqus 了，我想支持 WordPress WXR 导入或转换的评论框应该会有很多吧，在 LeanCloud 不给用后到换用其他评论框之前还是先关掉评论好了。（其实本来也没多少人评论</p><p>（说到底还是多说好用，为多说默哀三秒钟。</p><figure class="highlight bash"><figcaption><span>valine-to-wxr.sh</span><a href="https://veltlion.github.io/valine-to-wxr/valine-to-wxr.sh">下载</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="comment"># 空</span></span><br><span class="line"><span class="comment"># Valine to WordPress WXR</span></span><br><span class="line"><span class="comment"># 2019-07-03</span></span><br><span class="line"></span><br><span class="line">comfile=<span class="string">&quot;<span class="variable">$1</span>&quot;</span></span><br><span class="line">site=<span class="string">&quot;<span class="variable">$2</span>&quot;</span></span><br><span class="line"></span><br><span class="line">line=$(grep comment <span class="variable">$comfile</span> |wc -l)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">comment</span></span>() &#123;</span><br><span class="line">    <span class="keyword">for</span> ((j=0; j&lt;<span class="variable">$line</span>; j++)); <span class="keyword">do</span></span><br><span class="line">        linkc=$(jq -r <span class="string">&quot;.results[<span class="variable">$j</span>].url&quot;</span> <span class="variable">$comfile</span>)</span><br><span class="line">        <span class="keyword">if</span> [[ <span class="variable">$link</span> == <span class="variable">$linkc</span> ]]; <span class="keyword">then</span></span><br><span class="line">            comid=$(jq -r <span class="string">&quot;.results[<span class="variable">$j</span>].objectId&quot;</span> <span class="variable">$comfile</span>)</span><br><span class="line">            author=$(jq -r <span class="string">&quot;.results[<span class="variable">$j</span>].nick&quot;</span> <span class="variable">$comfile</span>)</span><br><span class="line">            email=$(jq -r <span class="string">&quot;.results[<span class="variable">$j</span>].mail&quot;</span> <span class="variable">$comfile</span>)</span><br><span class="line">            aurl=$(jq -r <span class="string">&quot;.results[<span class="variable">$j</span>].link&quot;</span> <span class="variable">$comfile</span> | sed <span class="string">&#x27;s/^null$//&#x27;</span>)</span><br><span class="line">            aip=$(jq -r <span class="string">&quot;.results[<span class="variable">$j</span>].ip&quot;</span> <span class="variable">$comfile</span>)</span><br><span class="line">            date=$(jq -r <span class="string">&quot;.results[<span class="variable">$j</span>].createdAt&quot;</span> <span class="variable">$comfile</span> | sed <span class="string">&#x27;s/T/ /; s/\.[0-9]\&#123;3\&#125;Z//&#x27;</span>)</span><br><span class="line">            parent=$(jq -r <span class="string">&quot;.results[<span class="variable">$j</span>].rid&quot;</span> <span class="variable">$comfile</span> | sed <span class="string">&#x27;s/^null$//&#x27;</span>)</span><br><span class="line">            content=$(jq -r <span class="string">&quot;.results[<span class="variable">$j</span>].comment&quot;</span> <span class="variable">$comfile</span>)</span><br><span class="line"></span><br><span class="line">            <span class="built_in">echo</span>  <span class="string">&quot;&lt;wp:comment&gt;</span></span><br><span class="line"><span class="string">                    &lt;wp:comment_id&gt;<span class="variable">$comid</span>&lt;/wp:comment_id&gt;</span></span><br><span class="line"><span class="string">                    &lt;wp:comment_author&gt;<span class="variable">$author</span>&lt;/wp:comment_author&gt;</span></span><br><span class="line"><span class="string">                    &lt;wp:comment_author_email&gt;<span class="variable">$email</span>&lt;/wp:comment_author_email&gt;</span></span><br><span class="line"><span class="string">                    &lt;wp:comment_author_url&gt;<span class="variable">$aurl</span>&lt;/wp:comment_author_url&gt;</span></span><br><span class="line"><span class="string">                    &lt;wp:comment_author_IP&gt;<span class="variable">$ip</span>&lt;/wp:comment_author_IP&gt;</span></span><br><span class="line"><span class="string">                    &lt;wp:comment_date_gmt&gt;<span class="variable">$date</span>&lt;/wp:comment_date_gmt&gt;</span></span><br><span class="line"><span class="string">                    &lt;wp:comment_content&gt;&lt;&quot;</span>!<span class="string">&quot;[CDATA[<span class="variable">$content</span>]]&gt;&lt;/wp:comment_content&gt;</span></span><br><span class="line"><span class="string">                    &lt;wp:comment_approved&gt;1&lt;/wp:comment_approved&gt;</span></span><br><span class="line"><span class="string">                    &lt;wp:comment_parent&gt;<span class="variable">$parent</span>&lt;/wp:comment_parent&gt;</span></span><br><span class="line"><span class="string">                  &lt;/wp:comment&gt;&quot;</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">item</span></span>() &#123;</span><br><span class="line">    <span class="keyword">for</span> ((i=0; i&lt;<span class="variable">$line</span>; i++)); <span class="keyword">do</span></span><br><span class="line">        link=$(jq -r <span class="string">&quot;.results[<span class="variable">$i</span>].url&quot;</span> <span class="variable">$comfile</span>)</span><br><span class="line">        touch <span class="variable">$comfile</span>.xml</span><br><span class="line">        check=$(grep <span class="variable">$link</span> <span class="variable">$comfile</span>.xml)</span><br><span class="line">        <span class="keyword">if</span> [[ <span class="variable">$check</span> != <span class="string">&#x27;&#x27;</span> ]]; <span class="keyword">then</span></span><br><span class="line">            <span class="built_in">continue</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">        <span class="keyword">if</span> [[ <span class="variable">$site</span> != <span class="string">&#x27;&#x27;</span> ]]; <span class="keyword">then</span></span><br><span class="line">            page=$(curl -s $site<span class="variable">$link</span>)</span><br><span class="line">            title=$(<span class="built_in">echo</span> <span class="variable">$page</span> | grep -Po <span class="string">&#x27;(?&lt;=\&lt;title\&gt;).*(?=\&lt;\/title\&gt;)&#x27;</span>)</span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">&quot;&lt;item&gt;</span></span><br><span class="line"><span class="string">            &lt;title&gt;<span class="variable">$title</span>&lt;/title&gt;</span></span><br><span class="line"><span class="string">            &lt;link&gt;$site<span class="variable">$link</span>&lt;/link&gt;</span></span><br><span class="line"><span class="string">            &lt;content:encoded&gt;&lt;&quot;</span>!<span class="string">&quot;[CDATA[]]&gt;&lt;/content:encoded&gt;</span></span><br><span class="line"><span class="string">            &lt;wp:post_date_gmt&gt;&lt;/wp:post_date_gmt&gt;</span></span><br><span class="line"><span class="string">            &lt;wp:comment_status&gt;open&lt;/wp:comment_status&gt;</span></span><br><span class="line"><span class="string">            <span class="subst">$(comment)</span></span></span><br><span class="line"><span class="string">            &lt;/item&gt;&quot;</span>&gt;&gt;<span class="variable">$comfile</span>.xml</span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;rss version=&quot;2.0&quot; xmlns:wp=&quot;http://wordpress.org/export/1.0/&quot; xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot; xmlns:dsq=&quot;http://www.disqus.com/&quot; xmlns:content=&quot;http://purl.org/rss/1.0/modules/content/&quot;&gt;&lt;channel&gt;&#x27;</span>&gt;&gt;<span class="variable">$comfile</span>.xml</span><br><span class="line">item</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;&lt;/channel&gt;&lt;/rss&gt;&#x27;</span>&gt;&gt;<span class="variable">$comfile</span>.xml</span><br><span class="line"><span class="built_in">echo</span> <span class="keyword">done</span>!</span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;　请所有用户在 6/25-7/25 期间尽快完成实名认证，对于未进行实名认证的账户，我们将禁止其创建或者激活应用，并禁止应用转移以及数据导入导出等操作，应用内具体的 API 请求不受影响；认证过渡期后我们会完全停止为尚未提交认证信息的账户提供服务。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;　　最近 LeanCloud 要实名才给用了，国际版也要验证手机号。可是本萌妹偏偏就不想实名，所以就只好放弃这个评论框了。好久没 po 文好不容易 po 一篇居然是这种……&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Valine" scheme="https://veltlion.github.io/tags/Valine/"/>
+    
+    <category term="Disqus" scheme="https://veltlion.github.io/tags/Disqus/"/>
+    
+    <category term="评论框" scheme="https://veltlion.github.io/tags/%E8%AF%84%E8%AE%BA%E6%A1%86/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>导出 Firefox 密码到 KeePass</title>
+    <link href="https://veltlion.github.io/export-firefox-password/"/>
+    <id>https://veltlion.github.io/export-firefox-password/</id>
+    <published>2018-06-18T18:36:50.000Z</published>
+    <updated>2020-08-30T04:07:37.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>从 Firefox 导出密码有几个方法：</p><ol><li><p>扩展：<a href="https://addons.mozilla.org/firefox/addon/password-exporter">Password Exporter</a></p></li><li><p>软件：<a href="https://github.com/Tiggerito/WebSiteAdvantage.KeePass.Firefox.Importer">Firefox to KeePass Password Importer</a></p></li></ol><span id="more"></span><p>  不过这两个导出之后中文用户名会变成乱码，所以换另一种方法。</p><ol start="3"><li>Chrome 大法<br> a. 首先，关闭我们的过气浏览器 Firefox ，然后打开先进的 Chrome 。<br>  b. 在地址栏输入 <a href="chrome://settings/importData">chrome://settings/importData</a> 回车，选择<code>Mozilla Firefox</code>，勾选<code>已保存的密码</code>，导入。<br>  c. 打开 <a href="chrome://flags/#PasswordExport">chrome://flags/#PasswordExport</a> ，选择<code>Enabled</code>。<br>  d. 打开 <a href="chrome://settings/passwords">chrome://settings/passwords</a> ，点击三点，导出密码。<br>  e. 打开 KeePass 2 ，文件，导入，选择<code>Google Chrome Passwords CSV</code>。</li></ol><p>怎么样，是不是很神奇？</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;从 Firefox 导出密码有几个方法：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;扩展：&lt;a href=&quot;https://addons.mozilla.org/firefox/addon/password-exporter&quot;&gt;Password Exporter&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;软件：&lt;a href=&quot;https://github.com/Tiggerito/WebSiteAdvantage.KeePass.Firefox.Importer&quot;&gt;Firefox to KeePass Password Importer&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="firefox" scheme="https://veltlion.github.io/tags/firefox/"/>
+    
+    <category term="keepass" scheme="https://veltlion.github.io/tags/keepass/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>唔…</title>
+    <link href="https://veltlion.github.io/23/"/>
+    <id>https://veltlion.github.io/23/</id>
+    <published>2018-03-13T22:42:00.000Z</published>
+    <updated>2020-08-30T04:07:37.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>换用 Hexo 之后就很少写心情之类的东西了。<br>　　以前用 WordPress 的时候编辑很方便，手机 APP 也很好用。还可以隐藏文章，可以不在主页显示。<br>　　换用 Hexo + GitHub Pages 之后，没有了隐藏文章，因为可以直接在 GitHub 上面看到。还有就是经常出现 新建文件 再填完 title 、date 之后忘记想写什么的情况。</p><span id="more"></span>　　发布就更麻烦了，WordPress 的 APP 只要写好然后按一下按钮就好了，Hexo 却要打开终端敲命令，还要忍受 nodejs 超长的加载时间，不过谁让这是免费的呢。<p>　　评论也是没有好用的，多说死了，disqus 被墙，而且不能修改 url ，改了的话整个页面的评论都会消失，再改回去也不能复原。导出来备份不能再导入。现在用的 Valine 也是，没有二级评论。<br>　　从 WordPress 转换来的和最近写的日记只能雪藏在 _drafts 里面了，就连现在这个我都不知道放 _drafts 里面还是 _post 里面。</p><p>最初我弄 blog 明明是想记日记用啊。</p><!--more-->]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;换用 Hexo 之后就很少写心情之类的东西了。&lt;br&gt;　　以前用 WordPress 的时候编辑很方便，手机 APP 也很好用。还可以隐藏文章，可以不在主页显示。&lt;br&gt;　　换用 Hexo + GitHub Pages 之后，没有了隐藏文章，因为可以直接在 GitHub 上面看到。还有就是经常出现 新建文件 再填完 title 、date 之后忘记想写什么的情况。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>LINE Sticker Download</title>
+    <link href="https://veltlion.github.io/line-sticker-download/"/>
+    <id>https://veltlion.github.io/line-sticker-download/</id>
+    <published>2018-03-01T23:12:18.000Z</published>
+    <updated>2021-04-14T08:54:33.392Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　LINE 的贴图大部分都很可爱，很萌萌二次元，所以就想保存下来放到 <del>QQ</del> 、Telegram 上用。</p><p>　　一个一个的保存太麻烦，很久之前写了个脚本来下载。可是就在几月前，我那脚本和一百四十多小时的 BOTW 存档就因为 SSD 掉盘被某东的小哥带走了。满满当当的 MLC SSD 就这么变成了空荡荡的 TLC SSD ……</p><span id="more"></span><p>　　不过这都是很久以前的事情了，今天我又碰到一套好看的贴图想存下来，就 Google 看看有没有更简单的保存方法，然后看到 GitHub 上面有个把 LINE 贴图转到 Telegram 的工具，看一下源码发现了 LINE 的贴图包下载链接，可以直接下载。明明商店页面的图片还要验 Referrer 的说…</p><p><del><code>http://dl.stickershop.line.naver.jp/products/0/0/1/贴图ID/iphone/stickers@2x.zip</code></del></p><p>　　但这样也要手动改 url 再粘贴回车，还是很麻烦。</p><p>　　想到用油猴子应该可以在页面上加个下载按钮，可是我之前没接触过 js ，甚至连 js 的全名都拼不全……</p><p>　　好在搜索引擎是万能的，帮我解决了这些问题。不过还是有一些地方不明白，好多东西真是用到的时候才觉得少啊。</p><p>　　后来 Greasyfork 上的<a href="https://greasyfork.org/forum/discussion/35483/x">小伙伴(@seccomun)</a>说这个链接有问题，给了更好的贴图链接和絵文字的链接。</p><p>下面是一些链接</p><ol><li><p>静态贴图</p><p><code>https://stickershop.line-scdn.net/stickershop/v1/product/贴图ID/iphone/stickers@2x.zip</code></p></li><li><p>动态/声音贴图</p><p><code>https://stickershop.line-scdn.net/stickershop/v1/product/贴图ID/iphone/stickerpack@2x.zip</code></p></li><li><p>絵文字</p><p><code>https://stickershop.line-scdn.net/sticonshop/v1/贴图ID/sticon/iphone/package.zip?v=1</code></p></li><li><p>主题包</p><p>主题包的链接可以从主题页面的主题封面或预览图片中获取，比如像是这个<a href="https://store.line.me/themeshop/product/d93c073e-fcca-440b-93f6-e7e45a7645fa/">主题</a>。</p><ul><li><p>页面链接：<code>https://store.line.me/themeshop/product/d93c073e-fcca-440b-93f6-e7e45a7645fa</code></p></li><li><p>封面： <code>https://shop.line-scdn.net/themeshop/v1/products/d9/3c/07/d93c073e-fcca-440b-93f6-e7e45a7645fa/4/WEBSTORE/icon_198x278.png?__=20161019</code></p></li><li><p>预览图：<code>https://shop.line-scdn.net/themeshop/v1/products/d9/3c/07/d93c073e-fcca-440b-93f6-e7e45a7645fa/4/ANDROID/ja/preview_001_720x1232.png</code></p></li></ul><p>然后下载地址就是：</p><ul><li>Android: <code>https://shop.line-scdn.net/themeshop/v1/products/d9/3c/07/d93c073e-fcca-440b-93f6-e7e45a7645fa/4/ANDROID/theme.zip</code></li><li>iOS: <code>https://shop.line-scdn.net/themeshop/v1/products/d9/3c/07/d93c073e-fcca-440b-93f6-e7e45a7645fa/4/IOS/theme.zip</code></li></ul></li></ol><p>　　</p><center><img src="1.png" alt="截图" style="width:600px !important"></center><p>下面是脚本内容，也可以去 <a href="https://greasyfork.org/scripts/39015-line-sticker-download">Greasyfork</a> 安装。</p><figure class="highlight javascript"><figcaption><span>LINE Sticker Download.user.js</span><a href="https://veltlion.github.io/line-sticker-download/LINE%20Sticker%20Download.user.js">Install</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ==UserScript==</span></span><br><span class="line"><span class="comment">// @name                LINE Sticker Download</span></span><br><span class="line"><span class="comment">// @name:zh-CN          LINE Sticker Download</span></span><br><span class="line"><span class="comment">// @name:ja             LINE Sticker Download</span></span><br><span class="line"><span class="comment">// @namespace           https://veltlion.github.io/line-sticker-download</span></span><br><span class="line"><span class="comment">// @include             https://store.line.me/stickershop/product/*</span></span><br><span class="line"><span class="comment">// @include             https://store.line.me/emojishop/product/*</span></span><br><span class="line"><span class="comment">// @include             https://store.line.me/themeshop/product/*</span></span><br><span class="line"><span class="comment">// @icon                https://secure.gravatar.com/avatar/6b0d31e600391e6f15240323202f5482</span></span><br><span class="line"><span class="comment">// @version             1.8</span></span><br><span class="line"><span class="comment">// @description         Add download button for line sticker/emoji/theme store.</span></span><br><span class="line"><span class="comment">// @description:zh-cn   在 LINE STORE 的 Sticker/Emoji/Theme 页面添加下载按钮。</span></span><br><span class="line"><span class="comment">// @description:ja      LINE STORE にダウンロードボタンを追加する。</span></span><br><span class="line"><span class="comment">// @author              空</span></span><br><span class="line"><span class="comment">// @grant               GM_download</span></span><br><span class="line"><span class="comment">// ==/UserScript==</span></span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line"><span class="meta">    &#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> path, id, btn, btn2, btnstr, link2, filename, link, lang ;</span><br><span class="line">    path = <span class="built_in">window</span>.location.pathname;</span><br><span class="line">    id = path.replace(<span class="regexp">/\/(emoji|sticker)shop\/product\/([a-f\d]+).*/</span>, <span class="string">&#x27;$2&#x27;</span>);</span><br><span class="line">    <span class="comment">//var lang = navigator.language;</span></span><br><span class="line">    lang = <span class="built_in">document</span>.documentElement.lang;</span><br><span class="line">    btnstr = <span class="string">&#x27;Download&#x27;</span>;</span><br><span class="line">    <span class="keyword">if</span> (lang.indexOf(<span class="string">&#x27;zh&#x27;</span>) &gt; -<span class="number">1</span>) btnstr = <span class="string">&#x27;下载&#x27;</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (lang.indexOf(<span class="string">&#x27;ja&#x27;</span>) &gt; -<span class="number">1</span>) btnstr = <span class="string">&#x27;ダウンロードする&#x27;</span>;</span><br><span class="line">    <span class="keyword">if</span> (path.indexOf(<span class="string">&#x27;stickershop&#x27;</span>) &gt; -<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> ($(<span class="string">&#x27;span&#x27;</span>).hasClass(<span class="string">&#x27;MdIcoAni_b&#x27;</span>) || $(<span class="string">&#x27;span&#x27;</span>).hasClass(<span class="string">&#x27;MdIcoPlay_b&#x27;</span>) ||$(<span class="string">&#x27;span&#x27;</span>).hasClass(<span class="string">&#x27;MdIcoSound_b&#x27;</span>) ||</span><br><span class="line">            $(<span class="string">&#x27;span&#x27;</span>).hasClass(<span class="string">&#x27;MdIcoFlashAni_b&#x27;</span>) || $(<span class="string">&#x27;span&#x27;</span>).hasClass(<span class="string">&#x27;MdIcoFlash_b&#x27;</span>)) &#123;</span><br><span class="line">                link = <span class="string">&#x27;https://stickershop.line-scdn.net/stickershop/v1/product/&#x27;</span> + id + <span class="string">&#x27;/iphone/stickerpack@2x.zip&#x27;</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                link = <span class="string">&#x27;https://stickershop.line-scdn.net/stickershop/v1/product/&#x27;</span> + id + <span class="string">&#x27;/iphone/stickers@2x.zip&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (path.indexOf(<span class="string">&#x27;emojishop&#x27;</span>) &gt; -<span class="number">1</span>) &#123;</span><br><span class="line">        link = <span class="string">&quot;https://stickershop.line-scdn.net/sticonshop/v1/&quot;</span> + id + <span class="string">&quot;/sticon/iphone/package.zip?v=1&quot;</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        id = $(<span class="string">&quot;div.mdCMN38Img&gt;img&quot;</span>).attr(<span class="string">&quot;src&quot;</span>).replace(<span class="regexp">/https\:\/\/shop.line-scdn.net\/themeshop\/v1\/products\/(.+)\/WEBSTORE\/.+/</span>, <span class="string">&#x27;$1&#x27;</span>);</span><br><span class="line">        link = <span class="string">&#x27;https://shop.line-scdn.net/themeshop/v1/products/&#x27;</span> + id + <span class="string">&#x27;/ANDROID/theme.zip&#x27;</span>;</span><br><span class="line">        link2 = <span class="string">&#x27;https://shop.line-scdn.net/themeshop/v1/products/&#x27;</span> + id + <span class="string">&#x27;/IOS/theme.zip&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    btn  = <span class="string">&#x27;&lt;li style=&quot;list-style-type: none&quot;&gt;&lt;button class=&quot;MdBtn01P02&quot; style=&quot;background: #33b1ff&quot; id=&quot;download&quot; &gt;&#x27;</span> + btnstr + <span class="string">&#x27;&lt;/button&gt;&lt;/li&gt;&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    $(<span class="string">&#x27;.mdCMN38Item01Ul&#x27;</span>).find(<span class="string">&#x27;li:eq(0)&#x27;</span>).remove();</span><br><span class="line">    $(<span class="string">&#x27;.mdCMN38Item01Ul&#x27;</span>).prepend(btn);</span><br><span class="line">    <span class="keyword">if</span> (path.indexOf(<span class="string">&#x27;themeshop&#x27;</span>) &gt; -<span class="number">1</span>) &#123;</span><br><span class="line">        btn2 = <span class="string">&#x27;&lt;li style=&quot;list-style-type: none&quot;&gt;&lt;button class=&quot;MdBtn01P02&quot; style=&quot;background: #00b84f&quot; id=&quot;download2&quot; &gt;&#x27;</span> + btnstr + <span class="string">&#x27; (iOS)&lt;/button&gt;&lt;/li&gt;&#x27;</span>;</span><br><span class="line">        $(<span class="string">&#x27;.mdCMN38Item01Ul&#x27;</span>).find(<span class="string">&#x27;li:eq(1)&#x27;</span>).remove();</span><br><span class="line">        $(<span class="string">&#x27;.mdCMN38Item01Ul&#x27;</span>).append(btn2);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ($(<span class="string">&#x27;div&#x27;</span>).hasClass(<span class="string">&#x27;mdMN05Btn&#x27;</span>)) &#123;</span><br><span class="line">        $(<span class="string">&#x27;.mdMN05Btn&#x27;</span>).prepend(btn2);</span><br><span class="line">        $(<span class="string">&#x27;.mdMN05Btn&#x27;</span>).prepend(btn);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    filename = <span class="built_in">document</span>.title.replace(<span class="regexp">/(.+) (-|–) .+/g</span>, <span class="string">&#x27;$1&#x27;</span>);</span><br><span class="line">    filename = filename.replace(<span class="regexp">/\&quot;|\\|\/|\:|\*|\?|\&lt;|\&gt;|\|/g</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">    <span class="keyword">var</span> file = &#123; <span class="attr">url</span>: link, <span class="attr">name</span>: filename + <span class="string">&#x27;.zip&#x27;</span> &#125;;</span><br><span class="line">    <span class="keyword">var</span> file2 = &#123; <span class="attr">url</span>: link2, <span class="attr">name</span>: filename + <span class="string">&#x27; (iOS).zip&#x27;</span> &#125;;</span><br><span class="line"></span><br><span class="line">    $(<span class="string">&#x27;body&#x27;</span>).on(<span class="string">&#x27;click&#x27;</span>, <span class="string">&#x27;#download2&#x27;</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; <span class="keyword">var</span> result = GM_download(file2); &#125;);</span><br><span class="line">    $(<span class="string">&#x27;body&#x27;</span>).on(<span class="string">&#x27;click&#x27;</span>, <span class="string">&#x27;#download&#x27;</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; <span class="keyword">var</span> result = GM_download(file); &#125;);</span><br><span class="line"></span><br><span class="line">&#125;());</span><br><span class="line"></span><br></pre></td></tr></table></figure><p><img src="21645952@2x.png" alt="LINE"></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　LINE 的贴图大部分都很可爱，很萌萌二次元，所以就想保存下来放到 &lt;del&gt;QQ&lt;/del&gt; 、Telegram 上用。&lt;/p&gt;
+&lt;p&gt;　　一个一个的保存太麻烦，很久之前写了个脚本来下载。可是就在几月前，我那脚本和一百四十多小时的 BOTW 存档就因为 SSD 掉盘被某东的小哥带走了。满满当当的 MLC SSD 就这么变成了空荡荡的 TLC SSD ……&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="LINE" scheme="https://veltlion.github.io/tags/LINE/"/>
+    
+    <category term="Sticker" scheme="https://veltlion.github.io/tags/Sticker/"/>
+    
+    <category term="油猴" scheme="https://veltlion.github.io/tags/%E6%B2%B9%E7%8C%B4/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>编译 Samba 笔记</title>
+    <link href="https://veltlion.github.io/cross-compile-samba/"/>
+    <id>https://veltlion.github.io/cross-compile-samba/</id>
+    <published>2018-02-26T15:57:01.000Z</published>
+    <updated>2020-08-30T04:07:37.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　最近给机顶盒刷了第三方的 Android TV 7.1.2 ，系统不带 Samba 了，SambaDroid 也经常自己退出不太好用了，entware 里面的 smbd 也跑不起来，这就很难受。于是就想自己编译一个。（感觉最近都在搞这些东西。。。</p><span id="more"></span>　　正好看到有人做了 Samba4.1.5 的[编译脚本和补丁](https://github.com/Jumbo88888/Samba)，改改就能拿来用了。<p>　　如果用 WSL 的话一定要先去掉 $PATH 中 Windows 传进来的环境变量，不然碰到带空格的 Windows 变量会出错。<br>　　还有就是 <strong><font color=red>珍爱生命，不要用 WSL 编译任何东西，CPU 根本跑不满，浪费时间。</font></strong></p><figure class="highlight bash"><figcaption><span>auto.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 第 42 行 </span></span><br><span class="line">    CC=aarch64-linux-gnu-gcc \</span><br><span class="line">       ./configure \</span><br><span class="line">       --host=aarch64-linux-gnu \</span><br><span class="line">       --build=x86_64-linux \</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第 103 行开始直到 make</span></span><br><span class="line">    CC=aarch64-linux-gnu-gcc AR=aarch64-linux-gnu-ar LD=aarch64-linux-gnu-ld \</span><br><span class="line">        CPP=aarch64-linux-gnu-cpp RANLIB=aarch64-linux-gnu-gcc-ranlib  \</span><br><span class="line">        CFLAGS=<span class="string">&quot;-I<span class="variable">$PYTHON_OBJ</span>/include/python2.7 -I<span class="variable">$SAMBA</span>/lib/talloc/ -I<span class="variable">$SAMBA</span>/lib/tevent \</span></span><br><span class="line"><span class="string">                -I<span class="variable">$SAMBA</span>/lib/tdb/include -I<span class="variable">$SAMBA</span>/lib/ldb/include/ \</span></span><br><span class="line"><span class="string">                -I<span class="variable">$SAMBA</span>/lib/ldb/ -I<span class="variable">$SAMBA</span>/source3/include/autoconf/ \</span></span><br><span class="line"><span class="string">                -march=armv8-a+crypto+crc -mtune=cortex-a53&quot;</span> \</span><br><span class="line">        LDFLAGS=<span class="string">&quot;-Wl,-dynamic-linker,/system/samba/glibc/ld-linux-aarch64.so.1 -Wl,-rpath,/system/samba/glibc&quot;</span> \</span><br><span class="line">        LIBDIR=<span class="string">&quot;-L<span class="variable">$PYTHON_OBJ</span>/lib/&quot;</span> \</span><br><span class="line">        python_LDFLAGS=<span class="string">&quot;-L<span class="variable">$PYTHON_OBJ</span>/lib/ -lpython2.7&quot;</span> \</span><br><span class="line">        python_LIBDIR=<span class="string">&quot;<span class="variable">$PYTHON_OBJ</span>/lib/&quot;</span> \</span><br><span class="line">        ./buildtools/bin/waf \</span><br><span class="line">        configure \</span><br><span class="line">        --cross-compile --cross-answers=arm.txt --hostcc=gcc \</span><br><span class="line">        --without-acl-support --without-ad-dc --without-ads --without-ldap \</span><br><span class="line">        --without-pam --without-pie --without-fam --without-dmapi --without-profiling-data \</span><br><span class="line">        --without-winbind --without-regedit --without-automount --without-utmp \</span><br><span class="line">        --without-dnsupdate --without-cluster-support \</span><br><span class="line">        --disable-cups --disable-iprint \</span><br><span class="line">        --disable-gnutls --disable-glusterfs --disable-avahi \</span><br><span class="line">        --enable-selftest \</span><br><span class="line">        --builtin-libraries=talloc,pytalloc-util \</span><br><span class="line">        --bundled-libraries=talloc,pytalloc-util,tdb,tevent,ldb \</span><br><span class="line">        --prefix=/system/samba \</span><br><span class="line"></span><br><span class="line">    make</span><br><span class="line"></span><br><span class="line"><span class="comment"># --with-aio-support \</span></span><br></pre></td></tr></table></figure><p>　　试过静态编译，可编译出来还是 dynamically linked ，后来换成动态的了。<br>　　动态编译的话要在 CFLAGS 里加 <code>-Wl,-dynamic-linker,/path/to/xx.so</code> 和 <code>-Wl,-rpath,/path/to/xxdir</code> ，不然会 <code>No such file or directory</code> 。<br>　　<code>march</code> 和 <code>mtune</code> 可以在目标机器上用 <code>gcc -c -Q -march=native --help=target | grep -E &#39;march=|mtune=&#39;</code> 获取。<br>　　还有就是 <code>--enable-debug</code> 和 <code>--enable-selftest</code> 。有这两个的话万一出错会报错报的很仔细，没有的话直接中断编译除了 error 什么也不留下。<br>　　编译出来的加上编译器的 C 库有一百二十多兆字节，感觉有点太大了，我看 SambaDroid 里面的只有 8 MiB…因为 /data 空间很宝贵，我把东西都放到 /system/samba 里面了。<br>　　还有要手动在 /etc 建个 passwd 文件。</p><figure class="highlight c"><figcaption><span>/etc/passwd</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root:x:<span class="number">0</span>:<span class="number">0</span>:root::/system/bin/sh</span><br><span class="line">miu:x:<span class="number">0</span>:<span class="number">0</span>:root::/system/bin/sh</span><br><span class="line">nobody:x:<span class="number">9999</span>:<span class="number">9999</span></span><br></pre></td></tr></table></figure><p>添加用户设置密码<br><code>/system/samba/bin/smbpasswd -a miu</code></p><p>配置文件</p><figure class="highlight nginx"><figcaption><span>/system/samba/etc/smb.conf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line"><span class="attribute">workgroup</span> = WORKGROUP</span><br><span class="line">server string = miu</span><br><span class="line">netbios name = miu</span><br><span class="line">security = user</span><br><span class="line"></span><br><span class="line">[miu]</span><br><span class="line">comment = Android /storage/emulated/<span class="number">0</span></span><br><span class="line">path = /storage/emulated/<span class="number">0</span></span><br><span class="line">read only = <span class="literal">no</span></span><br><span class="line">writable = <span class="literal">yes</span></span><br><span class="line">guest ok = <span class="literal">no</span></span><br><span class="line"></span><br><span class="line">[nyanpass]</span><br><span class="line">path = /storage/AA667397667362CD</span><br><span class="line">read only = <span class="literal">no</span></span><br><span class="line">writable = <span class="literal">yes</span></span><br><span class="line">guest ok = <span class="literal">no</span></span><br></pre></td></tr></table></figure><p>然后再写个脚本开机自动启动。</p><figure class="highlight bash"><figcaption><span>/etc/init.d/99smbd.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> TMPDIR=/data/<span class="built_in">local</span>/tmp</span><br><span class="line">/system/bin/mount -o rw,remount /system</span><br><span class="line">/system/samba/sbin/smbd -D</span><br><span class="line">/system/samba/sbin/nmbd -D</span><br></pre></td></tr></table></figure><p>脚本开机启动的时候要指定下 <code>TMPDIR</code> ，不然设置开机启动后连接不上，会报错<code>canonicalize_connect_path failed for service IPC$, path /tmp</code> 。</p><p>编译完成的<a href="https://yadi.sk/d/BnAdR4zZ3Xzwv7">文件</a>，默认用户名是 <code>miu</code> ，默认密码是 <code>1234</code> 。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　最近给机顶盒刷了第三方的 Android TV 7.1.2 ，系统不带 Samba 了，SambaDroid 也经常自己退出不太好用了，entware 里面的 smbd 也跑不起来，这就很难受。于是就想自己编译一个。（感觉最近都在搞这些东西。。。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Android" scheme="https://veltlion.github.io/tags/Android/"/>
+    
+    <category term="交叉编译" scheme="https://veltlion.github.io/tags/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/"/>
+    
+    <category term="机顶盒" scheme="https://veltlion.github.io/tags/%E6%9C%BA%E9%A1%B6%E7%9B%92/"/>
+    
+    <category term="samba" scheme="https://veltlion.github.io/tags/samba/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>蛋炒饭</title>
+    <link href="https://veltlion.github.io/%E8%9B%8B%E7%82%92%E9%A5%AD/"/>
+    <id>https://veltlion.github.io/%E8%9B%8B%E7%82%92%E9%A5%AD/</id>
+    <published>2018-01-10T12:25:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　蛋炒饭。顾名思义，就是蛋和米饭炒在一起，我更习惯叫它鸡蛋炒米饭。至于蛋炒饭和鸡蛋炒米饭有什么区别，我也不知道。大概就和番茄炒蛋和西红柿炒鸡蛋的关系差不多吧。<br>　　最近几天的食物都是蛋炒饭，我不知道一直吃同样的食物会不会腻，至少现在还没吃腻，如果吃腻的话我可能就要直接吃剩米饭了。<span id="more"></span><br>　　我也不知道我到底喜欢不喜欢做菜，我很享受做菜的过程：绑上马尾，系上围裙，在灶台前面手忙脚乱，也喜欢让别人看到我做菜的样子。但做好之后又觉得付出的劳动和收到结果不成正比。食用成果的时候也并没有什么特别的感觉，只是觉得在进食罢了。之后迎来的也只是和之前一样的空腹感或是饱足感，并伴随着一点心里空空的感觉。再望向满是狼藉的厨房，这种感觉就愈加强烈了。</p><h4 id="话离题有点远了，来炒饭吧。"><a href="#话离题有点远了，来炒饭吧。" class="headerlink" title="话离题有点远了，来炒饭吧。"></a>话离题有点远了，来炒饭吧。</h4><p>　　先是蛋。因为蛋炒饭嘛，蛋排第一个，为什么蛋排第一个呢。谁知道，想想肉夹馍的名字，也许都只是个叫法。<br>　　<strong>两个鸡蛋</strong>，打到碗里面，去掉白色部分，听说白色的部分会有不好的味道。蛋白和蛋清分开来炒比较香，不过我嫌麻烦，就直接炒了。<br>　　<strong>一碗米饭</strong>，搞碎一点放到盘子里。大家说隔夜的饭比较好炒一点。<br>　　<strong>葱</strong>切成小块，可以切多一点，这样炒出来会有甜甜的味道。然后放到装米饭端盘子里面。（爆香是绝对不可能爆香的，因为我会炒糊。<br>　　<strong>盐</strong>也是这样，撒到装米饭的盘子里面。不确定量的话可以少放一点，但绝对不要多。因为炒完没有咸味的话还可以趁着饭的余温再一点点加盐翻炒，放多就只能含着眼泪吃下去了。<br>　　可以依口味放一些味精或鸡精。本来要我放味精我是拒绝的，不过放一点真的比较好吃。</p><h4 id="炒"><a href="#炒" class="headerlink" title="炒"></a>炒</h4><p>　　把锅子刷好，大火，烧干。人家常说大火炒菜比较香，热锅放油炒菜比较好吃。还有就是如果没烧干就放油的话，油热了之后里面会爆炸。</p><h5 id="放油"><a href="#放油" class="headerlink" title="放油"></a>放油</h5><p>　　油多的话炒出来的饭会很腻，吃的时候是很香，但吃完就会很难受。炒米饭的话应该要比炒菜油少一点。油量多少，只能说是全凭经验了，多炒几次也许就能掌握。</p><h5 id="油温"><a href="#油温" class="headerlink" title="油温"></a>油温</h5><p>　　油太凉的话会变和泥，不过一般不会太凉。油太热的话鸡蛋放进去马上就会变成块状，这样的话不容易和米饭炒匀，味道也会变老。一般炒菜时会把油加热到冒小白烟，然后放蛋进去搅拌就好了。</p><h5 id="炒蛋"><a href="#炒蛋" class="headerlink" title="炒蛋"></a>炒蛋</h5><p>　　把油加热到合适的温度就可以放蛋进去炒了。放完蛋就要用铲子不停的搅动翻炒蛋液。搅几下就好了，时间不要太长。然后放入米饭。<br>　　这也是把调料和米饭混在一起的原因，因为炒蛋的时候要不停地炒，炒到正好时就要马上加入料和饭。如果这时候手忙脚乱找米饭、找调料，蛋很容易就老了。</p><h5 id="炒饭"><a href="#炒饭" class="headerlink" title="炒饭"></a>炒饭</h5><p>　　米饭加进去后不停地，不停地翻炒就可以了，这是整道菜最最累费力气的时候了。米饭有结块的话可以用铲背压压，炒到米粒都分开的时候就可以吃了。<br>　　炒出来差不多两碗饭，一顿来说有点多了，不过我一天吃一顿饭这量刚刚好。<br>　　感觉也就是这样吧，真正能让自己觉得好吃的蛋炒饭我也就做出过一次。做法都是一样，也许是当时的心境不同吧</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　蛋炒饭。顾名思义，就是蛋和米饭炒在一起，我更习惯叫它鸡蛋炒米饭。至于蛋炒饭和鸡蛋炒米饭有什么区别，我也不知道。大概就和番茄炒蛋和西红柿炒鸡蛋的关系差不多吧。&lt;br&gt;　　最近几天的食物都是蛋炒饭，我不知道一直吃同样的食物会不会腻，至少现在还没吃腻，如果吃腻的话我可能就要直接吃剩米饭了。</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+    <category term="食物" scheme="https://veltlion.github.io/tags/%E9%A3%9F%E7%89%A9/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>编译 Aria2 笔记</title>
+    <link href="https://veltlion.github.io/cross-compile-aria2/"/>
+    <id>https://veltlion.github.io/cross-compile-aria2/</id>
+    <published>2017-12-07T08:51:04.000Z</published>
+    <updated>2021-04-19T13:55:28.919Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　从官网下的 Aria2 放机顶盒里一直打不开，提示 <code>aria2c: not executable: 32-bit ELF file</code> ，再加上官方的 Aria2 有连接数限制。所以就想自己编译个试试。<br>　　机顶盒是 S912 的，Win10 的 WSL 挺方便的，直接装 <code>aarch64-linux-gnu</code> 编译器静态编译。</p><span id="more"></span><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu pkg-config-aarch64-linux-gnu</span><br><span class="line"><span class="comment"># 因为脚本写有些东西要放在编译器目录里，所以再 </span></span><br><span class="line">sudo chown <span class="variable">$UID</span> -R /usr/aarch64-linux-gnu</span><br><span class="line"><span class="comment"># 库目录的权限</span></span><br><span class="line">sudo mkdir -p /opt/aria2-arm</span><br><span class="line">sudo chown <span class="variable">$UID</span> /opt/aria2-arm</span><br></pre></td></tr></table></figure><p>有人写了静态交叉编译<a href="https://github.com/q3aql/aria2-static-builds">脚本</a>，改改就能用了。</p><p>修改的部分</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注释掉 TOOL_BIN_DIR 和 PATH</span></span><br><span class="line">ARCH=<span class="string">&quot;aarch64&quot;</span></span><br><span class="line">HOST=<span class="string">&quot;aarch64-linux-gnu&quot;</span></span><br><span class="line">PREFIX=<span class="string">&quot;/opt/aria2-arm/build_libs&quot;</span></span><br><span class="line">LOCAL_DIR=<span class="string">&quot;/opt/aria2-arm/build_libs&quot;</span></span><br><span class="line"><span class="comment"># march 和 mtune 可以在盒子里用 `gcc -c -Q -march=native --help=target | grep -E &#x27;march=|mtune=&#x27;` 获取。</span></span><br><span class="line">CFLAGS=<span class="string">&quot;-march=armv8-a+crypto+crc -mtune=cortex-a53&quot;</span></span><br><span class="line">DEST=<span class="string">&quot;/usr/aarch64-linux-gnu&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 把 linux-armv4 改成 linux-aarch64 。</span></span><br></pre></td></tr></table></figure><p><code>aria2-arm-rbpi-gnu-linux-cross-config</code>里面加上去除 Aria2 最大连接数限制的补丁。</p><figure class="highlight bash"><figcaption><span>aria2-arm-rbpi-gnu-linux-cross-config</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://aur.archlinux.org/cgit/aur.git/plain/aria2-fast.patch?h=aria2-fast -O aria2-fast.patch</span><br><span class="line">patch -Np1 &lt; aria2-fast.patch</span><br></pre></td></tr></table></figure><p>执行完脚本再 make、strip 就完了。<br>不过编译完之后放机顶盒里面还是打不开，又换别的编译器编译了几次，还是不行，这就很神奇。<br>到最后本萌妹惊讶地发现，盒子上面的 aria2c 和本地的大小不一样……<br>最后检查了 FileZilla 设置才发现传输类型是自动选择，改成二进制再传一遍，<br>就可以跑了……<br>就可以跑了……<br>就可以跑了……<br>当时我就这个表情。<img src="/images/34.png" alt="这个表情"><br>我浪费了这么多时间就是因为这个！？</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　从官网下的 Aria2 放机顶盒里一直打不开，提示 &lt;code&gt;aria2c: not executable: 32-bit ELF file&lt;/code&gt; ，再加上官方的 Aria2 有连接数限制。所以就想自己编译个试试。&lt;br&gt;　　机顶盒是 S912 的，Win10 的 WSL 挺方便的，直接装 &lt;code&gt;aarch64-linux-gnu&lt;/code&gt; 编译器静态编译。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Android" scheme="https://veltlion.github.io/tags/Android/"/>
+    
+    <category term="交叉编译" scheme="https://veltlion.github.io/tags/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/"/>
+    
+    <category term="机顶盒" scheme="https://veltlion.github.io/tags/%E6%9C%BA%E9%A1%B6%E7%9B%92/"/>
+    
+    <category term="S912" scheme="https://veltlion.github.io/tags/S912/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>真好看啊</title>
+    <link href="https://veltlion.github.io/%E7%9C%9F%E5%A5%BD%E7%9C%8B%E5%95%8A/"/>
+    <id>https://veltlion.github.io/%E7%9C%9F%E5%A5%BD%E7%9C%8B%E5%95%8A/</id>
+    <published>2017-10-08T04:08:00.000Z</published>
+    <updated>2021-04-19T13:55:28.918Z</updated>
+    
+    <content type="html"><![CDATA[<p>我家主子真可爱</p><span id="more"></span><center><img src="/images/IMG_20171008_120819.jpg" height="510px" alt="老婆"></center>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;我家主子真可爱&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>给海美迪 H7 四代刷第三方固件</title>
+    <link href="https://veltlion.github.io/flash-h7-4/"/>
+    <id>https://veltlion.github.io/flash-h7-4/</id>
+    <published>2017-09-26T08:06:12.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　前几天给盒子清数据，连上网就被自动装了 CIBN聚精彩 、CIBN聚体育。<br>　　emmmmm…<br>　　加上之前这系统用着各种不爽，像是没有通知栏啊、没有多任务界面啊、太丑啊、版本太低啊、kodi 花瓶之类的，所以干脆刷成别的好了。找找发现 S912 有好多包，还有 LibreELEC、Lakka 之类的。<br>　　后来我发现这玩意还能装 Linux ，真是神奇，不过 Linux 的话还是等盒子退休再说吧。</p><span id="more"></span><!-- toc --><h2 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h2><p>　　刷什么之前都应该先做好备份，因为官方根本就没提供固件，只有卡刷包。<br>　　为了保险起见，推荐备份之前刷入<a href="https://veltlion.github.io/ttl-root-h7-4/">这个</a>下面的 TWRP 。（因为官方的 rec 进去就是格式化 data 并重启，如果恢复失败有可能会无限重启。</p><h4 id="备份到电脑"><a href="#备份到电脑" class="headerlink" title="备份到电脑"></a>备份到电脑</h4><ol><li>盒子执行（需要root）<br><code>/system/xbin/busybox nc -l -p 5000 -e /system/xbin/busybox dd if=/dev/block/mmcblk0</code></li><li>电脑执行<br><code>nc 盒子IP 5000 &gt; mmcblk0</code></li></ol><p>ps. 也可以不备份 data 分区，这样文件会比较小，也会省很多时间和空间。<br><code>/system/xbin/busybox nc -l -p 5000 -e /system/xbin/busybox dd if=/dev/block/mmcblk0 bs=4M count=643</code></p><h4 id="备份到-SD-卡或-U-盘"><a href="#备份到-SD-卡或-U-盘" class="headerlink" title="备份到 SD 卡或 U 盘"></a>备份到 SD 卡或 U 盘</h4><p>盒子执行（需要root）<br><code>/system/xbin/busybox dd if=/dev/block/mmcblk0 of=/storage/SD卡UUID/mmcblk0nodata bs=4M count=643</code><br><code>SD卡UUID</code>可以在<code>/storage</code>里面看，是一串字母和数字。<br>备份这段时间我们可以去下载刷机包。</p><h2 id="其他-Android"><a href="#其他-Android" class="headerlink" title="其他 Android"></a>其他 Android</h2><p><img src="f_Android.jpg" alt="Android"><br>　　刷机会清除全部数据，记得备份原系统和数据。<br>　　另外再备份下这两个文件，刷完再恢复。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 蓝牙遥控器键值</span></span><br><span class="line">/system/usr/keylayout/HIMEDIA.kl</span><br><span class="line"><span class="comment">## 红外遥控器键值</span></span><br><span class="line">/system/etc/remote.conf</span><br></pre></td></tr></table></figure><ul><li>用 BootcardMaker 制作启动卡。然后插进盒子，执行<code>reboot update</code>，盒子会重启升级。</li><li>或是用双公头 USB 线连接电脑和盒子（插靠后面的 USB 口）用 USB Burning Tool 刷。</li></ul><h4 id="一些固件的下载地址"><a href="#一些固件的下载地址" class="headerlink" title="一些固件的下载地址"></a>一些固件的下载地址</h4><ul><li><a href="https://forum.freaktab.com/forum/tv-player-support/beelink-aa/beelink-android-tv-box/gt1/firmware-roms-tools-cg/611261">Android 6.1</a> 上面的截图就是这个固件。自带 Samba ，启动器带通知显示。不知道为什么 superceleron 的原帖消失了，我把固件上传到了<a href="https://yadi.sk/d/yDPOojBtPyLU_A">网盘</a>。先刷 SCV10A-GT1.img ，再卡刷 OTA-SCV11-GT1.zip 和 SCV11-A912-AP6255-Support.zip 。</li><li><a href="https://forum.freaktab.com/forum/tv-player-support/beelink-aa/beelink-android-tv-box/gt1/firmware-roms-tools-cg/659653">Android 7.1</a> 自带 Google 全家桶的 Android 7.1 固件。</li><li><del><a href="https://forum.freaktab.com/forum/tv-player-support/beelink-aa/beelink-android-tv-box/gt1/firmware-roms-tools-cg/659783">Android TV 7.1.2</a> 自带 Google 全家桶的 Android TV 7.1 固件。</del>最近更新后蓝牙遥控器会失效。</li><li><a href="https://forum.freaktab.com/forum/tv-player-support/beelink-aa/beelink-android-tv-box/gt1/firmware-roms-tools-cg/657916">Android TV 7.1.2</a> 只有 Play 服务、商店和 YouTube，data 分区比较大，钛备份看到有 12.3 GiB 。目前在用，不过精简的有点多，DocumentsUI 都没，我放到网盘里了，可以自己添加。</li><li>还可以自己 Google 搜索或是去 freaktab 、<a href="https://forum.xda-developers.com/android-stick--console-computers/amlogic">xda</a> 这类的地方找。</li></ul><h4 id="一些问题和解决办法"><a href="#一些问题和解决办法" class="headerlink" title="一些问题和解决办法"></a>一些问题和解决办法</h4><ul><li>蓝牙遥控器只能关机不能开机：按钮改成休眠后可休眠唤醒。不过盒子24小时挂着 BT 下动画片，用不着关机功能问题也不大。</li><li>红蓝按钮：修改<code>HIMEDIA.kl</code>，把红蓝键改成别的功能（<a href="https://developer.android.com/reference/android/view/KeyEvent.html">按键参考</a>）。我这有一个<a href="HIMEDIA.kl">改好的</a>，红色是静音，蓝色是截图。</li><li>鼠标模式：安装 <a href="https://yadi.sk/d/lyF8wTHV3Xzwnm">Mouse Toggle for Android TV</a> ，在无障碍中启用，按音量减再快速按音量加开启，HOME 关闭。</li><li>语音：换个支持 Android TV 语音的遥控器。或者在手机上装个 <a href="https://play.google.com/store/apps/details?id=com.google.android.tv.remote">Android TV Remote Control</a> 。</li><li>另外有些固件不能驱动有线网卡，目前还没有解决方法。</li></ul><p>前几天自带的蓝牙遥控器坏掉了，我脑抽花80大洋买了个原厂白的…现在想想还不如买个飞鼠。</p><h2 id="LibreELEC"><a href="#LibreELEC" class="headerlink" title="LibreELEC"></a>LibreELEC</h2><p><img src="f_LibreELEC.jpg" alt="LibreELEC"><br>　　<a href="https://libreelec.tv/">LibreELEC</a> 其实就是个 kodi ，扩展比 kodi 多点。跟 Android 版的 kodi 比起来就是多了些程序，放 H265 不会花屏了。也能装 entware 之类的。<br>　　不过 LibreELEC 官方已经不对 S912 更新了，可以换用 <a href="https://coreelec.org/">CoreELEC</a> 。<br>　　<a href="http://www.lakka.tv/get/linux/s912/">Lakka</a> 也已经支持 S912 了，安装和 LibreELEC 差不多。<br>　　它们都可以装到 SD 卡里面，官方的<a href="https://forum.libreelec.tv/thread/5848">安装说明</a>写的很详细，照着做就好了。<br>　　另外这两个蓝牙遥控器也是只能关机不能开机，按钮改成休眠后可休眠唤醒。</p><h2 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h2><p><img src="f_Armbian.png" alt="Armbian"><br>　　装 Linux 的话可以直接用别人做好的镜像做启动卡，有 Armbian、ArchLinux、openSUSE 和 AltLinux 的，可以去<a href="https://forum.freaktab.com/forum/tv-player-support/amlogic-based-tv-players/606133-linux-images-for-s802-s805-s812-s905-s905x-s912-sd-usb-emmc">这个帖子</a>下载。安装说明可以看<a href="https://forum.armbian.com/topic/7930-armbian-for-amlogic-s9xxx-kernel-41x-ver-555/">这个</a>。</p><h2 id="刷回官方（恢复备份）"><a href="#刷回官方（恢复备份）" class="headerlink" title="刷回官方（恢复备份）"></a>刷回官方（恢复备份）</h2><ol><li><p>把备份的文件放到 SD 卡 或 U 盘，重启到 TWRP 。</p><p><code>reboot recovery</code></p><p>因为有些固件恢复到一半会休眠，所以用 TWRP 恢复。</p></li><li><p>如果 SD 卡 或 U 盘 没有自动挂载的话，需要手动挂载。</p><p><code>mount /dev/block/mmcblk1 /usb-otg/</code></p><p>上面是 SD 卡 的路径，U 盘 的话可能是<code>/dev/block/sda</code>，具体可以在<code>/dev/block/</code>下面看。</p></li><li><p>恢复备份。</p><p><code>dd if=/usb-otg/mmcblk0nodata of=/dev/block/mmcblk0</code></p></li><li><p>恢复完成后用 TWRP 重启到 Recovery。</p></li></ol><p>原厂 Recovery 的话会自动格式化 data 分区并重启。<br>如果是 TWRP 的话要手动格式化一下。</p><h2 id="官方固件一些问题的解决方法"><a href="#官方固件一些问题的解决方法" class="headerlink" title="官方固件一些问题的解决方法"></a>官方固件一些问题的解决方法</h2><ul><li>没有通知栏：装 Snowball Smart Notifications 显示通知。</li><li>没有最近任务界面：插个飞鼠或者键盘 Alt + Tab 。</li><li>官方固件偷偷给用户安装软件：<ul><li>后台偷偷安装软件的是系统自带的启动器，可以换用第三方启动器然后直接删掉或禁用自带的启动器。</li><li>后来通过抓包找到推送列表地址，也可以在 hosts 里面加上一句<code>127.0.0.1 apkhome.hinavi.cp81.ott.cibntv.net</code>屏蔽。</li><li>屏蔽推送和广告的 <a href="hosts">hosts</a> 。</li></ul></li></ul><p><img src="f_%E6%8A%93%E5%8C%85.png" alt="抓包"><br>还有一些<a href="https://yadi.sk/d/lyF8wTHV3Xzwnm">有的没的</a>。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　前几天给盒子清数据，连上网就被自动装了 CIBN聚精彩 、CIBN聚体育。&lt;br&gt;　　emmmmm…&lt;br&gt;　　加上之前这系统用着各种不爽，像是没有通知栏啊、没有多任务界面啊、太丑啊、版本太低啊、kodi 花瓶之类的，所以干脆刷成别的好了。找找发现 S912 有好多包，还有 LibreELEC、Lakka 之类的。&lt;br&gt;　　后来我发现这玩意还能装 Linux ，真是神奇，不过 Linux 的话还是等盒子退休再说吧。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Android" scheme="https://veltlion.github.io/tags/Android/"/>
+    
+    <category term="机顶盒" scheme="https://veltlion.github.io/tags/%E6%9C%BA%E9%A1%B6%E7%9B%92/"/>
+    
+    <category term="H7四代" scheme="https://veltlion.github.io/tags/H7%E5%9B%9B%E4%BB%A3/"/>
+    
+    <category term="ROOT" scheme="https://veltlion.github.io/tags/ROOT/"/>
+    
+    <category term="S912" scheme="https://veltlion.github.io/tags/S912/"/>
+    
+    <category term="LibreELEC" scheme="https://veltlion.github.io/tags/LibreELEC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>修改 AMI BIOS 的启动 LOGO</title>
+    <link href="https://veltlion.github.io/change-uefi-boot-logo/"/>
+    <id>https://veltlion.github.io/change-uefi-boot-logo/</id>
+    <published>2017-09-25T06:50:34.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　MSI 主板的启动图片看腻了，想换一个，可找了好多替换工具都换不到启动图。</p><p>　　后来用 UEFIExtract 直接把 BIOS 全部解包，找到了图片位置。</p><p>　　刷修改过的 BIOS 有可能把主板变砖。上次搞坏过一次，还好主板有 JSPI1 接口，在某宝买了个编程器刷好了。</p><span id="more"></span><!-- toc --><h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>需要用到 <a href="https://github.com/LongSoft/UEFITool/releases">UEFITool 和 UEFIExtract</a> 、修图软件。</p><h2 id="修改-BIOS"><a href="#修改-BIOS" class="headerlink" title="修改 BIOS"></a>修改 BIOS</h2><h4 id="解包"><a href="#解包" class="headerlink" title="解包"></a>解包</h4><p>用 UEFIExtract 解开 BIOS文件。</p><p><code>UEFIExtract BIOSfile all</code></p><h4 id="找图"><a href="#找图" class="headerlink" title="找图"></a>找图</h4><p>打开解完后的文件夹，搜索 body.bin 。</p><p><img src="c01%E6%90%9C%E7%B4%A2.png" alt="搜索"></p><p>搜索完 <code>Ctrl+A</code> 全选这些搜索结果，拖到改名工具里面，扩展名改成 jpg 。</p><p><img src="c02%E6%94%B9%E5%90%8D.png" alt="改名"></p><p>改完把搜索结果显示为大图标，向下滚动，就很容易找到图片文件。</p><p><img src="c03%E6%89%BE%E5%9B%BE.png" alt="找图"></p><p>找到后查看文件路径中的 GUID ，GUID 有两串，要后面的。</p><p><img src="c04%E5%A4%8D%E5%88%B6ID.png" alt="复制ID"></p><p>可以把图片拖出来并改成前面的复制的名字备用。</p><p>　　用文本编辑器或是十六进制编辑器打开这些图片查看文件头，把图片改回它本来的扩展名。（<a href="http://www.garykessler.net/library/file_sigs.html">文件头对照</a>，可以用 <code>Ctrl+F</code> 搜索。）</p><p><img src="c05%E6%96%87%E4%BB%B6%E5%A4%B4.png" alt="文件头"></p><p>像这种就是 JPG/JFIF 的。</p><h4 id="改图"><a href="#改图" class="headerlink" title="改图"></a>改图</h4><p>　　查看图片详细信息，把自己的图改成和BIOS里面那张一样格式、差不多大小的。如果文件太大了保存的时候会报错，所以不用太担心图片太大把 BIOS 改坏。</p><p>　　UEFI 启动图的高度最好不要太高，不然会被 Windows 的圆圈盖住。</p><p>　　我的启动选单背景图只有改成 1024x768 分辨率才能正常显示，其他的图片倒是没问题。</p><p>　　还有就是有的 BIOS 只认 JFIF 文件头的图片。</p><h4 id="替换"><a href="#替换" class="headerlink" title="替换"></a>替换</h4><p>改完图片之后用 UEFITool 打开BIOS文件，<code>Ctrl+F</code> 搜索要替换的图片的 GIUD 。</p><p><img src="c06%E6%90%9C%E7%B4%A2GUID.png" alt="搜索GUID"></p><p>展开到 Raw section 右键选择 Extract body… 保存成 jpg 看下是不是要改的那张图。</p><p>是的话再右键选择 Replace body… 替换成自己改的图片。</p><p><img src="c07%E6%9B%BF%E6%8D%A2.png" alt="替换"></p><h4 id="保存"><a href="#保存" class="headerlink" title="保存"></a>保存</h4><p>替换完 <code>Ctrl+S</code> 保存 BIOS 。</p><p>如果保存的时候出错了，有可能是图片文件太大了，存小点试试。</p><h2 id="刷入"><a href="#刷入" class="headerlink" title="刷入"></a>刷入</h2><p>最后刷进主板。</p><h2 id="改好的图"><a href="#改好的图" class="headerlink" title="改好的图"></a>改好的图</h2><h4 id="LEGACY-开机-LOGO"><a href="#LEGACY-开机-LOGO" class="headerlink" title="LEGACY 开机 LOGO"></a>LEGACY 开机 LOGO</h4><p><img src="c08legacy%E5%BC%80%E6%9C%BAlogo.jpg" alt="LEGACY开机LOGO"></p><h4 id="启动选单"><a href="#启动选单" class="headerlink" title="启动选单"></a>启动选单</h4><p><img src="c09%E5%90%AF%E5%8A%A8%E9%80%89%E5%8D%95.jfif" alt="启动选单"></p><h4 id="UEFI-开机-LOGO"><a href="#UEFI-开机-LOGO" class="headerlink" title="UEFI 开机 LOGO"></a>UEFI 开机 LOGO</h4><p><img src="c10uefi%E5%BC%80%E6%9C%BAlogo1.jpg" alt="UEFI开机LOGO"></p><p><img src="c11uefi%E5%BC%80%E6%9C%BAlogo2.jpg" alt="UEFI开机LOGO"></p><p><img src="c11uefi%E5%BC%80%E6%9C%BAlogo3.jpg" alt="UEFI开机LOGO"></p><h2 id="实际效果"><a href="#实际效果" class="headerlink" title="实际效果"></a>实际效果</h2><p><img src="c12uefi%E5%BC%80%E6%9C%BA%E5%9B%BE1.jpg" alt="UEFI开机"></p><p><img src="c13uefi%E5%BC%80%E6%9C%BA%E5%9B%BE2.jpg" alt="UEFI开机"></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　MSI 主板的启动图片看腻了，想换一个，可找了好多替换工具都换不到启动图。&lt;/p&gt;
+&lt;p&gt;　　后来用 UEFIExtract 直接把 BIOS 全部解包，找到了图片位置。&lt;/p&gt;
+&lt;p&gt;　　刷修改过的 BIOS 有可能把主板变砖。上次搞坏过一次，还好主板有 JSPI1 接口，在某宝买了个编程器刷好了。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="BIOS" scheme="https://veltlion.github.io/tags/BIOS/"/>
+    
+    <category term="AMI" scheme="https://veltlion.github.io/tags/AMI/"/>
+    
+    <category term="LOGO" scheme="https://veltlion.github.io/tags/LOGO/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>多说转 Disqus 的坑</title>
+    <link href="https://veltlion.github.io/%E5%A4%9A%E8%AF%B4%E8%BD%AC%20Disqus%20%E7%9A%84%E5%9D%91/"/>
+    <id>https://veltlion.github.io/%E5%A4%9A%E8%AF%B4%E8%BD%AC%20Disqus%20%E7%9A%84%E5%9D%91/</id>
+    <published>2017-06-16T22:20:57.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>url里面有<strong>中文</strong>的一定要把中文转成<strong>大写</strong>的<strong>urlcode</strong>，一定要是<strong>大写</strong>的！！！<br>Disqus后台直接导入含中文的url会被转成小写的urlcode，可浏览器直接访问是大写的，评论都不会显示，然后这就很监介了。<br>浪费好多时间。。。</p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;url里面有&lt;strong&gt;中文&lt;/strong&gt;的一定要把中文转成&lt;strong&gt;大写&lt;/strong&gt;的&lt;strong&gt;urlcode&lt;/strong&gt;，一定要是&lt;strong&gt;大写&lt;/strong&gt;的！！！&lt;br&gt;Disqus后台直接导入含中文的url会被转成小写的urlcode，可浏览器直接访问是大写的，评论都不会显示，然后这就很监介了。&lt;br&gt;浪费好多时间。。。&lt;/p&gt;</summary>
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>ROOT 海美迪 H7 四代</title>
+    <link href="https://veltlion.github.io/ttl-root-h7-4/"/>
+    <id>https://veltlion.github.io/ttl-root-h7-4/</id>
+    <published>2017-04-26T17:45:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　去年过年的时候想买个盒子，买之前在小米盒子3增强版和海美迪H7四代之间犹豫好久，最后花了399大洋买了H7四代（因为听说小米盒子更新成了广告盒子。（再后来发现还不如买个外贸盒子。<br>　　到手之后就想把 H7 四代 ROOT 了，adb root 没有开，试了各种工具也不行。网上也没有 root 成功的帖子。论坛的客服也说以后不会开放 root 。当时真是后悔死啦。<span id="more"></span><br>　　后来在逛海美迪论坛的时候发现有个拆机 TTL root 其他机型的帖子，想想H7四代也许也可以这样，正好手里有个ch341。就去网上找了四代的拆机图，一看还真有TTL接口。拆！保修是什么？吃了吧，Android不root能玩？（现在已经有方法不用拆机了<br>　　然后H7四代就红果果的躺在我面前了，嗯，<a href="#%E6%8B%86%E6%9C%BAroot">就像这样</a>。</p><!-- toc --><h2 id="拿到-root"><a href="#拿到-root" class="headerlink" title="拿到 root"></a>拿到 root</h2><p>文中提到一些文件可以到<a href="https://yadi.sk/d/5vajKyPA3XzwrP">这里</a>下载。</p><ul><li>选择一项</li><li><a href="#%E4%B8%8D%E7%94%A8%E6%8B%86%E6%9C%BA%E7%9A%84%E6%96%B9%E6%B3%95">不用拆机的方法</a></li><li><a href="#%E6%8B%86%E6%9C%BA-root">拆机 root</a></li></ul><h4 id="不用拆机的方法"><a href="#不用拆机的方法" class="headerlink" title="不用拆机的方法"></a>不用拆机的方法</h4><p>下载 BoxTool3.1.apk ，安装，打开。（如果 Google 提示不能安装，就在系统设置-高级设置-Google-安全性-验证应用程式里面关闭验证,然后再安装。）<br>用 telnet 连接到盒子。<br>然后看<a href="#%E5%AE%89%E8%A3%85-SuperSU">这个</a>。</p><h4 id="拆机-root"><a href="#拆机-root" class="headerlink" title="拆机 root"></a>拆机 root</h4><p>如果插了TF卡的话要先拿出来，不然板子会拿不下来（千万不要大力出奇迹，会断的。。。<br>拆开之后。<br><img src="h1.jpg" alt="红果果"><br>TTL线 GND接第一个 TXD接第三个 RXD接第四个<br>照上图接好 TTL 线之后，用 putty 之类的软件连接到盒子。<br>然后看<a href="#%E5%AE%89%E8%A3%85-SuperSU">这个</a>。</p><h2 id="安装-SuperSU"><a href="#安装-SuperSU" class="headerlink" title="安装 SuperSU"></a>安装 SuperSU</h2><ul><li>选择一项</li><li><a href="#%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85-SuperSU">手动安装 SuperSU</a></li><li><a href="#Recovery-%E5%88%B7%E5%85%A5-SuperSU">Recovery 刷入 SuperSU</a></li></ul><h4 id="手动安装-SuperSU"><a href="#手动安装-SuperSU" class="headerlink" title="手动安装 SuperSU"></a>手动安装 SuperSU</h4><p>把 SuperSU 卡刷包里面的 common/Superuser.apk 、 armv7/su 放到到盒子的 /sdcard ，然后执行</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">pm install -r /sdcard/Superuser.apk</span><br><span class="line">mount -o remount,rw /system</span><br><span class="line">cp /sdcard/su /system/xbin</span><br><span class="line">cp /sdcard/su /system/xbin/daemonsu</span><br><span class="line">chmod 4755 /system/xbin/su /system/xbin/daemonsu</span><br><span class="line">/system/xbin/su -ad</span><br></pre></td></tr></table></figure><p><img src="h2.png" alt="敲命令"><br>这时候打开盒子上的 SuperSU 会提示更新二进制文件，常规方式更新就好了。<br><img src="h3.png" alt="更新"><br>如果接上 TTL 的时候不能连电视的话可以在盒子上装个 TeamViewer ，远程过去点确定。<br>root 完成。</p><h4 id="Recovery-刷入-SuperSU"><a href="#Recovery-刷入-SuperSU" class="headerlink" title="Recovery 刷入 SuperSU"></a>Recovery 刷入 SuperSU</h4><ol><li>把H7四代的 TWRP Recovery 、SuperSU 的卡刷包包放到盒子的 /sdcard 。</li><li>备份原厂 recovery<br><code>dd if=/dev/block/recovery of=/sdcard/stock_recovery.img</code></li><li>刷入 TWRP<br><code>dd if=/sdcard/twrp-q201-3.1.1-0.img of=/dev/block/recovery</code></li><li>重启到 recovery<br><code>reboot recovery</code></li><li>插上鼠标，刷入 SuperSU 。</li><li>root 完成。</li></ol>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　去年过年的时候想买个盒子，买之前在小米盒子3增强版和海美迪H7四代之间犹豫好久，最后花了399大洋买了H7四代（因为听说小米盒子更新成了广告盒子。（再后来发现还不如买个外贸盒子。&lt;br&gt;　　到手之后就想把 H7 四代 ROOT 了，adb root 没有开，试了各种工具也不行。网上也没有 root 成功的帖子。论坛的客服也说以后不会开放 root 。当时真是后悔死啦。</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="机顶盒" scheme="https://veltlion.github.io/tags/%E6%9C%BA%E9%A1%B6%E7%9B%92/"/>
+    
+    <category term="H7四代" scheme="https://veltlion.github.io/tags/H7%E5%9B%9B%E4%BB%A3/"/>
+    
+    <category term="ROOT" scheme="https://veltlion.github.io/tags/ROOT/"/>
+    
+    <category term="S912" scheme="https://veltlion.github.io/tags/S912/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>入了个 x1s 的手柄</title>
+    <link href="https://veltlion.github.io/%E5%85%A5%E4%BA%86%E4%B8%AA%20x1s%20%E7%9A%84%E6%89%8B%E6%9F%84/"/>
+    <id>https://veltlion.github.io/%E5%85%A5%E4%BA%86%E4%B8%AA%20x1s%20%E7%9A%84%E6%89%8B%E6%9F%84/</id>
+    <published>2017-03-04T19:15:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>然后沉迷小姐姐们不能自拔…</p><span id="more"></span><p>![image](CNN 2017-03-03 15-52-46.jpg)<br>![image](CNN 2017-03-03 15-59-14.jpg)<br>アナス好帅啊，好想嫁给她啊</p><p><img src="5546056.png" alt="image"></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;然后沉迷小姐姐们不能自拔…&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>又把手机震动摔坏了…</title>
+    <link href="https://veltlion.github.io/%E5%8F%88%E6%8A%8A%E6%89%8B%E6%9C%BA%E9%9C%87%E5%8A%A8%E6%91%94%E5%9D%8F%E4%BA%86%E2%80%A6/"/>
+    <id>https://veltlion.github.io/%E5%8F%88%E6%8A%8A%E6%89%8B%E6%9C%BA%E9%9C%87%E5%8A%A8%E6%91%94%E5%9D%8F%E4%BA%86%E2%80%A6/</id>
+    <published>2016-12-24T18:36:00.000Z</published>
+    <updated>2021-04-19T13:55:28.905Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="/21/">历史总是惊人的相似啊…</a></p><!-- ![好痛啊](/images/86.png) --><p>我的=4T…好心疼啊…</p><span id="more"></span><hr><p>不要买一加不要买一加不要买一加</p><ul><li>屏幕辣眼睛，最近一年用这手机视力下降得厉害，都要戴眼镜了。</li><li>同样型号的的手机不同批次屏幕都不一样，我第二批买的是 A3 屏都开不了稍微不辣眼的 DCI-P3 ，同学后面买的 A5 屏就能开。</li><li>不支持 Project Treble 。</li><li>用久了摄像头还对不上焦。</li><li>震动也特别差。</li><li>官方系统后台偷偷收集用户隐私。</li><li>没一个好用的第三方 ROM ，不是这 bug 就是那 bug ，要不就是不能改色域，要不就是相机不好用。</li></ul>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;a href=&quot;/21/&quot;&gt;历史总是惊人的相似啊…&lt;/a&gt;&lt;/p&gt;
+&lt;!-- ![好痛啊](/images/86.png) --&gt;
+&lt;p&gt;我的=4T…好心疼啊…&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/tags/%E6%97%A5%E5%B8%B8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>小猫</title>
+    <link href="https://veltlion.github.io/%E5%B0%8F%E7%8C%AB/"/>
+    <id>https://veltlion.github.io/%E5%B0%8F%E7%8C%AB/</id>
+    <published>2016-10-09T14:57:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　这是三号时候的事了。<br>　　那天夜里十二点左右的时候因为失眠，出去散心。却发现院子里面来了只白色小猫，好可爱。<br>　　就用叫狗的方式叫了下他，会不会过来呐。<br>　　正在走向竹林的小猫听到声音后顿了一下，转过头看向我。（咦，这招好像真的有用！继续继续<span id="more"></span><br>　　确认声音的方向后，他转过身，迈着慵懒的步伐走了过来。在离我一米左右的地方停住，坐下来，歪着头看向我，像是在说“你要拿什么好吃的东西给我吃呢？”<br>　　激动的我急忙回头转向屋子，却失落起来。家里面连人吃的食物都没有，怎么还可能会有猫吃的…<br>　　回过头，猫猫继续歪着头，用那天真无邪的大眼睛看着我。<br>　　好尴尬啊好尴尬啊…怎么办啊…<br>　　“对不起喔，我这里没有食物给你吃。”<br>　　我只好看着他，他也望着我。<br>　　我们就这样互相望着。<br>　　（不要用那种眼神看着我啦。）<br>　　……<br>　　……<br>　　约莫两分钟左右，大概是不耐烦了。猫猫把头一扭，身子一抖，屁股一甩，走了。<br>　　冷清的月光洒在地上，望着跑向竹林的小猫，忽觉得心里空落落的，落寞起来。<br>　　“什么时候，能再来呢…”</p><!--more-->]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　这是三号时候的事了。&lt;br&gt;　　那天夜里十二点左右的时候因为失眠，出去散心。却发现院子里面来了只白色小猫，好可爱。&lt;br&gt;　　就用叫狗的方式叫了下他，会不会过来呐。&lt;br&gt;　　正在走向竹林的小猫听到声音后顿了一下，转过头看向我。（咦，这招好像真的有用！继续继续</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>要断网了</title>
+    <link href="https://veltlion.github.io/%E8%A6%81%E6%96%AD%E7%BD%91%E4%BA%86/"/>
+    <id>https://veltlion.github.io/%E8%A6%81%E6%96%AD%E7%BD%91%E4%BA%86/</id>
+    <published>2016-10-05T08:43:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>没有网可真是难熬啊…</p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;没有网可真是难熬啊…&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>在 Android 手机上面更新 Hexo 博客</title>
+    <link href="https://veltlion.github.io/hexo-on-android/"/>
+    <id>https://veltlion.github.io/hexo-on-android/</id>
+    <published>2016-09-06T14:45:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<pre><code>⊂彡☆))д´)你怎么就那么懒呢，开下电脑更新博客会死啊。</code></pre><p>　　平常都是空闲的时候在手机上面写完博客，然后 WOL 开电脑，把文章同步到电脑，SSH 连上去，再<code>hexo d -g</code>。麻烦死了。<br>　　后来想起 Termux 这个软件，抱着试试看的心情执行了下<code>apt install nodejs</code>，结果还真有。然后嘛，我的懒惰度又提高到了一个新的高度。</p><span id="more"></span><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>　　首先，手机上面装一个 Termux ，然后装 Hexo 。balabala，跟在电脑上装没什么区别。<br>　　然后把 Hexo 的主题、_config.yml 、package.json 还有 ssh key 复制到手机里。复制的时候要记得排除 node_modules 文件夹，还有传完要改一下所属用户和组。<br>　　再在博客目录执行<code>npm install</code>把插件装回来。</p><h2 id="写文章"><a href="#写文章" class="headerlink" title="写文章"></a>写文章</h2><p>　　装好之后要怎么写文章呢？Android 上面有好多写 Markdown 的工具，像是 neutriNote 、 易写和MarkdownX 。我用的是 MarkdownX 。不过因为这些软件的文章目录和 Termux 里面的 Hexo 目录不一样，复制来复制去很麻烦。所以我建了个软链接来解决这个问题，像是 MarkdownX ：<br><code>ln -s /storage/emulated/0/Android/data/com.ryeeeeee.markdownx/files/notes /data/data/com.termux/files/home/blog/source</code><br>　　这样博客的文章就在 MarkdownX 的数据目录里了。不过如果之前 Termux 的博客目录里面有 source 目录的话要先改名或删掉，不然软链接会被建到 source 里面。（多谢 xwah 提醒，说起来 xwah 刚和我说的时候我还理解错了。今天在手机上重装 Hexo 才明白这个问题Orz…<br>　　然后把电脑上面的文章复制到手机。<code>hexo d -g</code>就好啦。</p><h2 id="和电脑同步文章"><a href="#和电脑同步文章" class="headerlink" title="和电脑同步文章"></a>和电脑同步文章</h2><p>　　同步文件用的是 FolderSync 。我经常用它同步些照片、图片之类的到电脑。还可以同步到 OneDrive、GoogleDrive 之类的地方。</p><h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><p>　　我现在用的主题是 Tranquilpeak ，用之前要先在主题目录跑下<code>npm install</code>。如果要在手机上面修改这个主题的话有几个软件要装上：<br><code>apt install python2 make clang</code><br>　　不过这几个装完再加上主题依赖一共要500+MiB，所以还是在电脑上改改就好了。<br>　　还有主题的月份不知道为什么都变英文了，不管了，直接用 sed 替换一下。</p><h2 id="最后抱怨下"><a href="#最后抱怨下" class="headerlink" title="最后抱怨下"></a>最后抱怨下</h2><ul><li>Termux 的操作体验完全没有 JuiceSSH 好啊。我都想从上面开个 ssh 然后用 JuiceSSH 连上去了。(后来 Termux 更新变好用了。</li><li>还有我手机真的好慢啊，资源 minify 一下都要三分钟。</li></ul>]]></content>
+    
+    
+    <summary type="html">&lt;pre&gt;&lt;code&gt;⊂彡☆))д´)你怎么就那么懒呢，开下电脑更新博客会死啊。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;　　平常都是空闲的时候在手机上面写完博客，然后 WOL 开电脑，把文章同步到电脑，SSH 连上去，再&lt;code&gt;hexo d -g&lt;/code&gt;。麻烦死了。&lt;br&gt;　　后来想起 Termux 这个软件，抱着试试看的心情执行了下&lt;code&gt;apt install nodejs&lt;/code&gt;，结果还真有。然后嘛，我的懒惰度又提高到了一个新的高度。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Android" scheme="https://veltlion.github.io/tags/Android/"/>
+    
+    <category term="Hexo" scheme="https://veltlion.github.io/tags/Hexo/"/>
+    
+    <category term="Termux" scheme="https://veltlion.github.io/tags/Termux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>读书笔记</title>
+    <link href="https://veltlion.github.io/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    <id>https://veltlion.github.io/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</id>
+    <published>2016-08-28T17:29:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>前面的话</p><p>　　读书要做笔记。做笔记很重要。书中有许多许多很妙很美的词或句子值得去记。<br>　　我平时都是看网络上面的<del>盗版</del>电子书。之前 Anyview 的分享笔记功能很赞，可惜这个软件现在。又用静读天下，可之前记的几个不知道又消失到哪里去，真是靠不住。里面又有千把小时的阅读统计，不想换用。<br>　　就在这里记一下吧。<br><strong>记什么啦，好麻烦的，记这里还不如直接抄下来…</strong></p><span id="more"></span><h3 id="先是西游记"><a href="#先是西游记" class="headerlink" title="先是西游记"></a>先是西游记</h3><h4 id="关于唐僧喝酒"><a href="#关于唐僧喝酒" class="headerlink" title="关于唐僧喝酒"></a>关于唐僧喝酒</h4><blockquote><p>玄奘又谢恩，接了御酒道：“陛下，酒乃僧家头一戒，贫僧自为人，不会饮酒。”太宗道：“今日之行，比他事不同。<strong>此乃素酒</strong>，只饮此一杯，以尽朕奉饯之意。”三藏不敢不受。接了酒，方待要饮，只见太宗低头，将御指拾一撮尘土，弹入酒中。三藏不解其意。太宗笑道：“御弟呵，这一去，到西天，几时可回？”三藏道：“只在三年，径回上国。”太宗道：“日久年深，山遥路远，御弟可进此酒：宁恋本乡一捻土，莫爱他乡万两金。”三藏方悟捻土之意，<strong>复谢恩饮尽</strong>，辞谢出关而去。  ——「西游记」第十二回</p></blockquote><p>　　按说和尚应该是不能喝酒的，唐王说是“素酒”。看时纳闷了一下：酒不都是粮食做的吗？怎么还有荤素的说法。不过书里面有个注解：</p><blockquote><p>素酒——古时，酒有荤酒、素酒之分。素酒是用粮食、水果酿造。荤酒则酒中有荤腥。据《本草纲目》记载，有牛膝酒、虎骨酒、鹿头酒、鹿茸酒等。又如《本草纲目》还记载了京剧《空城计》中诸葛亮唱词提到的“羊羔美酒”的酿造法：用米一石，嫩肥羊肉七斤、麴十四两、杏仁一斤，同煮烂……可见荤酒酿造法之一般。</p></blockquote><p>　　原来还真有肉酿的酒，肉酿的酒不会是散发着肉块腐烂的气味吧。这样看来古时候的和尚喝酒应该不会犯戒，还挺有趣的。</p><blockquote><p>高老把素酒开樽，满斟一杯，奠了天地，然后奉与三藏。三藏道：“不瞒太公说，贫僧是胎里素，自幼儿不吃荤。”老高道：“因知老师清素，不曾敢动荤。此酒也是素的，请一杯不妨。”三藏道：“也不敢用酒。酒是我僧家第一戒者。”悟能慌了道：“师父，我自持斋，却不曾断酒。”悟空道：“老孙虽量窄，吃不上坛把，却也不曾断酒。”三藏道：“既如此，你兄弟们吃些素酒也罢。只是不许醉饮误事。”</p></blockquote><p>我搞不懂啦搞不懂啦</p><h4 id="古人告诉我们，有好东西要藏起来不让别人看到。"><a href="#古人告诉我们，有好东西要藏起来不让别人看到。" class="headerlink" title="古人告诉我们，有好东西要藏起来不让别人看到。"></a>古人告诉我们，有好东西要藏起来不让别人看到。</h4><blockquote><p>古人有云：‘珍奇玩好之物，不可使见贪婪奸伪之人。’倘若一经入目，必动其心；既动其心，必生其计。汝是个畏祸的，索之而必应其求，可也；不然，则殒身灭命，皆起于此，事不小矣。　　——「西游记」第十六回</p></blockquote><h4 id="悟空还吃过人"><a href="#悟空还吃过人" class="headerlink" title="悟空还吃过人"></a>悟空还吃过人</h4><blockquote><p>老孙在水帘洞里做妖魔时，若想人肉吃，便是这等：或变金银，或变庄台，或变醉人，或变女色。有那等痴心的爱上我，我就迷他到洞里，尽意随心，或蒸或煮受用；吃不了，还要晒干了防天阴哩！　　——「西游记」第二十七回</p></blockquote><h4 id="五谷轮回之所"><a href="#五谷轮回之所" class="headerlink" title="五谷轮回之所"></a>五谷轮回之所</h4><blockquote><p>行者道：“我才进来时，那右手下有一重小门儿，那里面秽气畜人，想必是个五谷轮回之所。你把他送在那里去罢。”</p></blockquote><h3 id="金瓶梅"><a href="#金瓶梅" class="headerlink" title="金瓶梅"></a>金瓶梅</h3><p>　　金瓶梅其实挺好看的，里面的诗啊词啊很不错。尤其是潘金莲被武二拒绝的时候引用的那句“落花有意随流水，流水无情恋落花。”我觉得很棒。</p><pre><code>六街箫鼓正喧阗，初月今朝一线添。睡去乌衣惊玉剪，斗来宵烛浑朱帘。香绡染处红余白，翠黛攒来苦味甜。阿姐当年曾似此，纵他戏汝不须嫌。</code></pre><p>这段查了好半天词典才懂</p><h3 id="一些词语"><a href="#一些词语" class="headerlink" title="一些词语"></a>一些词语</h3><ul><li><ruby>央<rp>(</rp><rt>yāng</rt><rp>)</rp>浼<rp>(</rp><rt>měi</rt><rp>)</rp></ruby>　——请求、央求。（不过我这里都是念yānggěi的。</li><li><ruby>薅<rp>(</rp><rt>hāo</rt><rp>)</rp>草<rp>(</rp><rt>cǎo</rt><rp>)</rp></ruby>　——拔草。薅：拔，除去。</li><li>够戗　——原来够戗的戗是这个戗</li><li><ruby>罢<rp>(</rp><rt>pí</rt><rp>)</rp></ruby>软　——软弱，形容做事没有主见，不果决</li><li>告诵</li><li>踅摸</li><li><ruby>恁<rp>(</rp><rt>nèn</rt><rp>)</rp></ruby>　——恁么大</li></ul>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;前面的话&lt;/p&gt;
+&lt;p&gt;　　读书要做笔记。做笔记很重要。书中有许多许多很妙很美的词或句子值得去记。&lt;br&gt;　　我平时都是看网络上面的&lt;del&gt;盗版&lt;/del&gt;电子书。之前 Anyview 的分享笔记功能很赞，可惜这个软件现在。又用静读天下，可之前记的几个不知道又消失到哪里去，真是靠不住。里面又有千把小时的阅读统计，不想换用。&lt;br&gt;　　就在这里记一下吧。&lt;br&gt;&lt;strong&gt;记什么啦，好麻烦的，记这里还不如直接抄下来…&lt;/strong&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+    <category term="笔记" scheme="https://veltlion.github.io/tags/%E7%AC%94%E8%AE%B0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>把键盘洗坏了…</title>
+    <link href="https://veltlion.github.io/%E6%8A%8A%E9%94%AE%E7%9B%98%E6%B4%97%E5%9D%8F%E4%BA%86%E2%80%A6/"/>
+    <id>https://veltlion.github.io/%E6%8A%8A%E9%94%AE%E7%9B%98%E6%B4%97%E5%9D%8F%E4%BA%86%E2%80%A6/</id>
+    <published>2016-08-21T14:47:47.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　昨天看到键盘里面脏脏的，就打算把键帽和壳子拆下来洗一下。可就在我把键帽拆下来打算继续拆键盘的时候发现之前辛辛苦苦找的螺丝刀不见了。<br>　　到底再那里呢？床上面、床底下、桌子底下、沙发上头、抽屉里面统统都没有！<br>　　找了有两个多小时吧，最后居然在鱼缸的边沿上面找到了。想必是之前在找到螺丝刀的时候看那个无鱼之缸看呆了，便落在了上面。真让我这通好找。<span id="more"></span><br>　　我小心翼翼地拆下键盘外壳，取出里面的薄膜和小片片，并把键帽和外壳放到小盆里面。走进浴室，一眼便瞧见那四四方方、方方正正、还会滚来滚去的物件。<br>　　脑袋灵光一闪，为何不将那手按的板子放入此物口中，洗而后快？遂将那黑块儿、板子倾入其中。<br>　　然后我就继续玩文明五去了，辣鸡德国，又谴责我，看我灭了你。<br>　　我灭了德国之后，忽然担心，就上网去问一位网友：“你说把键盘放到洗衣机里面洗会不会出问题啊？”他说：“会，准备重买吧。”<br>　　然后我赶忙跑入浴室，停了那机器，取出外壳和键帽，用水清洗。还好还好，壳子上面只是裂了一个小口。洗净之后滤干，组装。<br>　　哎哟我的 4 呢？4 跑到那里去了？又是一通好找。最后终于在洗衣机的过滤袋里面找到了。感谢国家感谢党。<br>　　重点来了，我装好键盘之后，插上电脑。想开机试试好坏，结果电脑开不开了，BIOS画面也进不去。难道BIOS又坏掉了？辣鸡微星！开机慢不说，BIOS还经常坏。又要去找人借电脑刷BIOS。砸了下键盘泄愤，电脑登时就开机了。又是那熟悉的LOGO，又是那萌萌二次元的壁纸，啧，死宅真恶心。输了下开机密码，键盘能用。咦？这是肿么回事捏？<br>　　重启了下，又是黑屏不能开机。按了下键盘，又开机了。重启，按键盘，开机。拔了键盘又重启，这次不用按键盘直接就开机了，~~耶~~~<br>　　看来是键盘拆坏了，等过几天想起来在拆开重新装一下吧。<br>　　跑去和那位网友诉苦：“菜，你怎么会想到用洗衣机洗键盘？”<br>　　我：“省事啊”<br>　　网友：“……<br>　　　　　　你很强<br>　　　　　　甘拜下风”<br>　　嗨呀好痛苦呀。那么多键帽拆开重装会累死我的。</p><!--more-->]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　昨天看到键盘里面脏脏的，就打算把键帽和壳子拆下来洗一下。可就在我把键帽拆下来打算继续拆键盘的时候发现之前辛辛苦苦找的螺丝刀不见了。&lt;br&gt;　　到底再那里呢？床上面、床底下、桌子底下、沙发上头、抽屉里面统统都没有！&lt;br&gt;　　找了有两个多小时吧，最后居然在鱼缸的边沿上面找到了。想必是之前在找到螺丝刀的时候看那个无鱼之缸看呆了，便落在了上面。真让我这通好找。</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/tags/%E6%97%A5%E5%B8%B8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>USB 网络共享</title>
+    <link href="https://veltlion.github.io/fix-usb-tethering-on-windows/"/>
+    <id>https://veltlion.github.io/fix-usb-tethering-on-windows/</id>
+    <published>2016-08-14T11:53:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　在 Windows 8 及以上操作系统中使用 Android 手机的 USB 网络共享 会使系统变得非常卡顿。今天无意中在 YouTube 上面看到了解决方法。</p><span id="more"></span><ol><li>打开<code>设备管理器</code>。</li><li>插上手机，打开 USB网络共享。</li><li><code>设备管理器</code>–&gt;<code>网络适配器</code>–&gt;<code>Remote NDIS xxxx</code>右键属性。</li><li>选择<code>驱动程序</code>–&gt;<code>更新驱动程序</code>。</li><li><code>浏览计算机查找</code>–&gt;<code>从计算机驱动程序列表选取</code>。</li><li>取消勾选<code>显示兼容硬件</code>，双击<code>Microsoft</code>–&gt;<code>USB RNDIS6 Adapter</code>。</li></ol><p>-end-</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　在 Windows 8 及以上操作系统中使用 Android 手机的 USB 网络共享 会使系统变得非常卡顿。今天无意中在 YouTube 上面看到了解决方法。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Android 6.0 之后 wap 接入点不能解析 DNS 的解决方法</title>
+    <link href="https://veltlion.github.io/android-wap-apn-dns/"/>
+    <id>https://veltlion.github.io/android-wap-apn-dns/</id>
+    <published>2016-08-09T13:21:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　Android 6.0 之后 wap 接入点不能解析 DNS 了，这查查那查查终于找到了解决方法。<span id="more"></span></p><ol><li>把手机的 boot 分区 dd 出来。</li><li>用 Image Kitchen for Android 或 bootimg 解开 boot 。</li><li>initrc 加入下面内容。</li><li>然后打包刷进手机。</li></ol><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># SetDNS</span></span><br><span class="line"><span class="attribute">on</span> property:net.dns<span class="number">1</span>=</span><br><span class="line">  <span class="attribute">setprop</span> net.dns<span class="number">1</span> <span class="number">223.5.5.5</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># rmnet_data0 为移动数据网卡名。</span></span><br><span class="line"><span class="attribute">on</span> property:net.rmnet_data<span class="number">0</span>.dns<span class="number">1</span>=</span><br><span class="line">  <span class="attribute">setprop</span> net.rmnet_data<span class="number">0</span>.dns<span class="number">1</span> <span class="number">223.5.5.5</span></span><br></pre></td></tr></table></figure><!--more-->]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　Android 6.0 之后 wap 接入点不能解析 DNS 了，这查查那查查终于找到了解决方法。</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Android" scheme="https://veltlion.github.io/tags/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>网易云音乐歌词转换</title>
+    <link href="https://veltlion.github.io/%E7%BD%91%E6%98%93%E4%BA%91%E9%9F%B3%E4%B9%90%E6%AD%8C%E8%AF%8D%E8%BD%AC%E6%8D%A2/"/>
+    <id>https://veltlion.github.io/%E7%BD%91%E6%98%93%E4%BA%91%E9%9F%B3%E4%B9%90%E6%AD%8C%E8%AF%8D%E8%BD%AC%E6%8D%A2/</id>
+    <published>2016-06-29T23:49:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>foobar2000 有网易云歌词的插件了，这个就不用了。</p></blockquote><p>　　在网易云音乐上面看到有首歌的歌词翻译的不错，想保存下来，翻翻缓存文件夹，发现格式不对。<br>　　Google 百度了一下找到个可以获取云音乐歌词的软件，试试看获取结果不全。又在知乎上面看到有人发，可是全是程序源码，我这么笨哪里会编译。只好自己鼓捣了个脚本。</p><span id="more"></span>　　后来又因为手机里面的 sed 有问题害我白折腾半天，最后用了 busybox 才解决。<p>　　这样文件名都是数字，不过也没办法了，手动改吧。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/system/bin/sh</span></span><br><span class="line"><span class="comment">#06-30-2016, Sora.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#网易云音乐APP的歌词目录</span></span><br><span class="line">nd=/sdcard/netease/cloudmusic/Cache/Lyric</span><br><span class="line"><span class="comment">#转换完成后的输出目录</span></span><br><span class="line">od=/sdcard/Android</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> `ls <span class="variable">$nd</span>`; <span class="keyword">do</span></span><br><span class="line">  lrc=$(cat <span class="variable">$nd</span>/<span class="variable">$i</span> | busybox sed <span class="string">&#x27;s/&quot;\[/\n\[/g; s/\\n/\n/g; s/]undefined/]/g&#x27;</span> | busybox sed <span class="string">&#x27;/&quot;lyric/d; /\[by:/d&#x27;</span>| busybox sed <span class="string">&#x27;s/&quot;.*&#125;//g&#x27;</span>)</span><br><span class="line">  <span class="keyword">if</span> [ -n <span class="string">&quot;<span class="variable">$lrc</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$lrc</span>&quot;</span> &gt; <span class="variable">$od</span>/<span class="variable">$i</span>.lrc</span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$od</span>/<span class="variable">$i</span>.lrc</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;foobar2000 有网易云歌词的插件了，这个就不用了。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;　　在网易云音乐上面看到有首歌的歌词翻译的不错，想保存下来，翻翻缓存文件夹，发现格式不对。&lt;br&gt;　　Google 百度了一下找到个可以获取云音乐歌词的软件，试试看获取结果不全。又在知乎上面看到有人发，可是全是程序源码，我这么笨哪里会编译。只好自己鼓捣了个脚本。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="lyric" scheme="https://veltlion.github.io/tags/lyric/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hexo 的 md 文件重命名</title>
+    <link href="https://veltlion.github.io/hexo-md-rename/"/>
+    <id>https://veltlion.github.io/hexo-md-rename/</id>
+    <published>2016-05-05T06:29:35.000Z</published>
+    <updated>2021-04-19T13:55:28.903Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　换用 Hexo 之后发现 <code>_post</code> 目录里面乱乱的，比如从 WordPress 中导入的中文标题文章的文件名会变成乱乱的字符串，看着很难受。所以搞了个改名的脚本来重命名文件。<br>　　重命名之后的格式为<code>PO文日期.文章标题.md</code>，如果文件内有注明<code>urlname</code>的话就是<code>PO文日期.文章标题.urlname.md</code>。</p><span id="more"></span>　　还有一件事很重要，就是**`_config.yml` 里面 `permalink:` 的 `:title` 指的是文件名，不是文章标题**。<figure class="highlight bash"><figcaption><span>rename.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#保存系统默认的 IFS</span></span><br><span class="line">SAVEIFS=<span class="variable">$IFS</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#更改 IFS 为换行（用于处理文件名含有空格的文件</span></span><br><span class="line">IFS=$<span class="string">&#x27;\n&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> filename <span class="keyword">in</span> *.md; <span class="keyword">do</span></span><br><span class="line">  <span class="comment">#标题（不想替换空格的话就删除“s/ /_/g”。</span></span><br><span class="line">  title=$(grep <span class="string">&quot;title: &quot;</span> <span class="variable">$filename</span> | head -1 | sed -e <span class="string">&#x27;s/title: //g; s#/##g;s/ /_/g&#x27;</span>)</span><br><span class="line">  <span class="comment">#发文日期</span></span><br><span class="line">  date=$(grep <span class="string">&quot;date: &quot;</span> <span class="variable">$filename</span> | awk <span class="string">&#x27;NR==1&#123;printf $2&#125;&#x27;</span> )</span><br><span class="line">  <span class="comment">#urlname</span></span><br><span class="line">  link=$(grep <span class="string">&quot;urlname: &quot;</span> <span class="variable">$filename</span> | head -1 | sed <span class="string">&#x27;s/urlname: //g&#x27;</span> )</span><br><span class="line">  <span class="comment">#新文件名</span></span><br><span class="line">  <span class="keyword">if</span> [ -z <span class="string">&quot;<span class="variable">$link</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="comment">#newname=&quot;$title.md&quot;</span></span><br><span class="line">    newname=<span class="string">&quot;<span class="variable">$date</span>.<span class="variable">$title</span>.md&quot;</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    <span class="comment">#newname=&quot;$title.md&quot;</span></span><br><span class="line">    <span class="comment">#newname=&quot;$date.$title.md&quot;</span></span><br><span class="line">    newname=<span class="string">&quot;<span class="variable">$date</span>.<span class="variable">$title</span>.<span class="variable">$link</span>.md&quot;</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line">  <span class="comment">#过滤掉名字正确的</span></span><br><span class="line">  <span class="keyword">if</span> [ <span class="string">&quot;<span class="variable">$filename</span>&quot;</span> != <span class="string">&quot;<span class="variable">$newname</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">     <span class="comment">#开始改名</span></span><br><span class="line">     <span class="built_in">echo</span> <span class="string">&quot;Rename <span class="variable">$filename</span> to <span class="variable">$newname</span>&quot;</span></span><br><span class="line">     mv <span class="variable">$filename</span> <span class="variable">$newname</span></span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="keyword">done</span>!</span><br></pre></td></tr></table></figure><p><img src="/images/65.png" alt="计画通り"><br>这样就舒服好多了。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　换用 Hexo 之后发现 &lt;code&gt;_post&lt;/code&gt; 目录里面乱乱的，比如从 WordPress 中导入的中文标题文章的文件名会变成乱乱的字符串，看着很难受。所以搞了个改名的脚本来重命名文件。&lt;br&gt;　　重命名之后的格式为&lt;code&gt;PO文日期.文章标题.md&lt;/code&gt;，如果文件内有注明&lt;code&gt;urlname&lt;/code&gt;的话就是&lt;code&gt;PO文日期.文章标题.urlname.md&lt;/code&gt;。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Hexo" scheme="https://veltlion.github.io/tags/Hexo/"/>
+    
+    <category term="重命名" scheme="https://veltlion.github.io/tags/%E9%87%8D%E5%91%BD%E5%90%8D/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>向AUR提交软件包</title>
+    <link href="https://veltlion.github.io/submitting-packages-to-aur/"/>
+    <id>https://veltlion.github.io/submitting-packages-to-aur/</id>
+    <published>2016-04-02T10:26:39.000Z</published>
+    <updated>2021-04-19T13:55:28.901Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　这个以前一直想写来着，不过免费的VPS挂掉了就一直没写。现在正好赶上有一个包需要更新加上博客也迁移成功，就事记录一下。省的以后更新包的时候忘记怎么弄。</p><span id="more"></span><h2 id="官方wiki上的介绍"><a href="#官方wiki上的介绍" class="headerlink" title="官方wiki上的介绍"></a>官方wiki上的介绍</h2><p>　　Arch用户软件仓库（Arch User Repository，AUR）是为用户而建、由用户主导的Arch软件仓库。AUR中的软件包以软件包生成脚本（PKGBUILD）的形式提供，用户自己通过makepkg生成包，再由pacman安装。创建AUR的初衷是方便用户维护和分享新软件包，并由官方定期从中挑选软件包进入community仓库。</p><h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>　　首先，需要一个AUR的帐户，打开 <code>https://aur.archlinux.org/register/</code> 注册。</p><h2 id="密钥"><a href="#密钥" class="headerlink" title="密钥"></a>密钥</h2><h3 id="生成密钥"><a href="#生成密钥" class="headerlink" title="生成密钥"></a>生成密钥</h3><p>　　wiki上面要求创建一个新的密钥(而不是用旧的)，这样出问题时可以直接废除密钥。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;your@mail.com&quot;</span></span><br><span class="line">---------------------------------------------</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file <span class="keyword">in</span> <span class="built_in">which</span> to save the key (/home/sora/.ssh/id_rsa):</span><br><span class="line"><span class="comment">#这里输入密钥的路径和名字，像是：/home/yourname/.ssh/aur_rsa</span></span><br><span class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase):</span><br><span class="line"><span class="comment">#私钥密码，可以为空。</span></span><br><span class="line">Enter same passphrase again:</span><br><span class="line"><span class="comment">#然后他就会告诉你生成的私钥和公钥的位置。</span></span><br><span class="line">Your identification has been saved <span class="keyword">in</span> /home/sora/.ssh/aur_rsa.</span><br><span class="line">Your public key has been saved <span class="keyword">in</span> /home/sora/.ssh/aur_rsa.pub.</span><br><span class="line"><span class="comment">#然后下面就是密钥指纹。</span></span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:kGYIbfFJhcdvCLftFuJDgGbRwbesMSd1+cHtMFRBOvg</span><br><span class="line">The key<span class="string">&#x27;s randomart image is:</span></span><br><span class="line"><span class="string">+---[RSA 2048]----+</span></span><br><span class="line"><span class="string">|  ..o*o=.  +.++. |</span></span><br><span class="line"><span class="string">|   .*+*o* o.=..  |</span></span><br><span class="line"><span class="string">|   +. BO B..o=   |</span></span><br><span class="line"><span class="string">|     o+.O =....  |</span></span><br><span class="line"><span class="string">|       OS+ .E    |</span></span><br><span class="line"><span class="string">|      . o o      |</span></span><br><span class="line"><span class="string">|         o       |</span></span><br><span class="line"><span class="string">|                 |</span></span><br><span class="line"><span class="string">|                 |</span></span><br><span class="line"><span class="string">+----[SHA256]-----+</span></span><br><span class="line"><span class="string"></span></span><br></pre></td></tr></table></figure><h3 id="添加到AUR"><a href="#添加到AUR" class="headerlink" title="添加到AUR"></a>添加到AUR</h3><p>　　登录刚刚注册的AUR用户，点击我的帐户。把刚刚生成的aur_rsa.pub文件的内容粘贴到 SSH Public Key 的框框里面。然后更新。</p><h3 id="修改SSH配置"><a href="#修改SSH配置" class="headerlink" title="修改SSH配置"></a>修改SSH配置</h3><p>　　如果不修改SSH配置文件的话，SSH是找不到刚刚新建的密钥的。<br>　　编辑~/.ssh/config文件。</p><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># AUR</span></span><br><span class="line">Host aur</span><br><span class="line">  HostName aur.archlinux.org</span><br><span class="line">  Port <span class="number">22</span></span><br><span class="line">  <span class="keyword">User</span> <span class="title">aur</span></span><br><span class="line">  IdentityFile ~/.ssh/aur_rsa <span class="comment">#私钥路径</span></span><br></pre></td></tr></table></figure><p>　　这样写就像是别名一样，之后可以用 aur 代替 HostName 的 aur.archlinux.org 。</p><h2 id="提交PKGBUILD"><a href="#提交PKGBUILD" class="headerlink" title="提交PKGBUILD"></a>提交PKGBUILD</h2><h3 id="创建仓库"><a href="#创建仓库" class="headerlink" title="创建仓库"></a>创建仓库</h3><p>　　克隆不存在的仓库会自动创建此仓库。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://aur/package_name.git</span><br></pre></td></tr></table></figure><p>　　这时当前目录会多出一个以软件包名命名的目录，接着把PKGBUILD之类的文件放到里面并cd进去。</p><h3 id="提交或更新"><a href="#提交或更新" class="headerlink" title="提交或更新"></a>提交或更新</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">makepkg --printsrcinfo &gt; .SRCINFO     <span class="comment">#生成.SRCINFO</span></span><br><span class="line">git add PKGBUILD .SRCINFO             <span class="comment">#添加文件</span></span><br><span class="line">git commit -m <span class="string">&#x27;更新信息&#x27;</span>               <span class="comment">#提交文件到本地库</span></span><br><span class="line">git push                              <span class="comment">#推送到AUR</span></span><br><span class="line"></span><br></pre></td></tr></table></figure><p>　　.SRCINFO是记录软件包元数据的文件，AUR工具和网站后端需要。并且每次提交或是更新前都需要生成。</p><h2 id="大功告成"><a href="#大功告成" class="headerlink" title="大功告成"></a>大功告成</h2><p>　　这样的话一个软件包就提交完成了。（当初为了这个包在网上查来查去查了好久<br>　　更新的包叫<code>kde-thumbnailer-epub</code>，是dolphin用来显示ePub文件缩略图的软件。喜欢看书的我怎么能容忍ePub没有封面呢。</p><p><img src="/images/y09.png" alt="阿卡林~"></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　这个以前一直想写来着，不过免费的VPS挂掉了就一直没写。现在正好赶上有一个包需要更新加上博客也迁移成功，就事记录一下。省的以后更新包的时候忘记怎么弄。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Arch Linux" scheme="https://veltlion.github.io/tags/Arch-Linux/"/>
+    
+    <category term="AUR" scheme="https://veltlion.github.io/tags/AUR/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>换用Hexo了</title>
+    <link href="https://veltlion.github.io/switch-to-hexo/"/>
+    <id>https://veltlion.github.io/switch-to-hexo/</id>
+    <published>2016-04-01T06:00:48.000Z</published>
+    <updated>2021-04-19T13:55:28.901Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　本来想记录下把 WordPress 从手机搬到 VPS 上的过程来着，可是免费的 VPS 没用几天就挂了，所以就鸽了吧。不过现在因为有好多东西想记所以想继续弄个 blog 之类的，毕竟放在手机上不好操作，外网也不能访问。VPS 又贵又麻烦，所以又在找第三方免费博客。<span id="more"></span><br>　　然后想起以前看到过有人在 Github 上面搞，就去 Google 了一下，没想到还有 GitHub Pages 这么方便的东西。<br>　　不过装起来好麻烦，虽然有 Github 的账号，但是一次也没用过。又去网上现查 Github 怎么用啊，Hexo 怎么装啊之类的。然后照着官方的文档还是叫 wiki 来着，把 WordPress 的文章也迁移过来了。虽然都是什么没有技术含量也很无聊而且没有意义的文章。<br>　　写博客也是，Hexo 要用 Markdown 这种完全没听说过的东西，后来又去查语法啊，怎么用之类。</p><blockquote><p>不过这篇文章就是用 Markdown 写的。</p></blockquote><p><img src="/images/f23.png" alt="自豪脸"><br>　　Markdown 好像没有办法控制图片显示的大小，上面的图显示出来应该会很大吧。而且换行方式简直不能忍。还要多拍两个空格！！<br>　　 <del>顺带一提图床用的是 wodemo.com 。挺好用的一个网盘，可以外链各种文件。不限容量，不过单个文件上传限制150M。以前用 JAVA 机的时候论坛里面分享文件都是用这个。速度…还行吧，最近有些慢了。</del><br>　　好吧，我收回上面那段话，磨的外链只有一周时间，不过引用时间在url里面，应该可以用 js 改，但是懒得改。还是不用图床更省事。<br>　　本来想记些东西来着，不过弄完之后又没什么想写的了。其实就是爱折腾。。。<br>　　好困啊，睡觉了。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　本来想记录下把 WordPress 从手机搬到 VPS 上的过程来着，可是免费的 VPS 没用几天就挂了，所以就鸽了吧。不过现在因为有好多东西想记所以想继续弄个 blog 之类的，毕竟放在手机上不好操作，外网也不能访问。VPS 又贵又麻烦，所以又在找第三方免费博客。</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Hexo" scheme="https://veltlion.github.io/tags/Hexo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>联通 WO-36 光猫改桥接</title>
+    <link href="https://veltlion.github.io/%E8%81%94%E9%80%9A%20WO-36%20%E5%85%89%E7%8C%AB%E6%94%B9%E6%A1%A5%E6%8E%A5/"/>
+    <id>https://veltlion.github.io/%E8%81%94%E9%80%9A%20WO-36%20%E5%85%89%E7%8C%AB%E6%94%B9%E6%A1%A5%E6%8E%A5/</id>
+    <published>2016-03-11T11:24:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<ol><li><a href="http://192.168.18.1/logoffaccount.html">http://192.168.18.1/logoffaccount.html</a> ，隐藏用户改为启用</li><li>登录工程帐号用户名：fiberhomehg2x0 密码：hg2x0</li><li>下载 <a href="http://192.168.18.1/backupsettings.conf">http://192.168.18.1/backupsettings.conf</a> 或开启 FTP 下载 <a href="ftp://192.168.18.1/fhconf/backpresettings.conf">ftp://192.168.18.1/fhconf/backpresettings.conf</a>  </li><li>搜索 AdminPassword ，base64 解码后用户名为 CUAdmin ，密码为 CUAdmin 。</li><li>打开 <a href="http://192.168.18.1/cu.html">http://192.168.18.1/cu.html</a> 登录。</li><li>修改桥接设置，F12 查看拨号密码，记下 VID 还原用。</li></ol><p>PS：这个光猫只有 LAN1 是千兆口。</p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;ol&gt;
+&lt;li&gt;&lt;a href=&quot;http://192.168.18.1/logoffaccount.html&quot;&gt;http://192.168.18.1/logoffaccount.html&lt;/a&gt; ，隐藏用户改为启用&lt;/li&gt;
+&lt;li&gt;登录工程帐号用户名：fiberhomehg2x0 密码：hg2x0&lt;/li&gt;
+&lt;li&gt;下载 &lt;a href=&quot;http://192.168.18.1/backupsettings.conf&quot;&gt;http://192.168.18.1/backupsettings.conf&lt;/a&gt; 或开启 FTP 下载 &lt;a href=&quot;ftp://192.168.18.1/fhconf/backpresettings.conf&quot;&gt;ftp://192.168.18.1/fhconf/backpresettings.conf&lt;/a&gt;  &lt;/li&gt;
+&lt;li&gt;搜索 AdminPassword ，base64 解码后用户名为 CUAdmin ，密码为 CUAdmin 。&lt;/li&gt;
+&lt;li&gt;打开 &lt;a href=&quot;http://192.168.18.1/cu.html&quot;&gt;http://192.168.18.1/cu.html&lt;/a&gt; 登录。&lt;/li&gt;
+&lt;li&gt;修改桥接设置，F12 查看拨号密码，记下 VID 还原用。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;PS：这个光猫只有 LAN1 是千兆口。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="光猫" scheme="https://veltlion.github.io/tags/%E5%85%89%E7%8C%AB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>去除「十六夜のフォルトゥーナ」日本語版Windows判定</title>
+    <link href="https://veltlion.github.io/%E5%8E%BB%E9%99%A4%E3%80%8C%E5%8D%81%E5%85%AD%E5%A4%9C%E3%81%AE%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E3%82%A5%E3%83%BC%E3%83%8A%E3%80%8D%E6%97%A5%E6%9C%AC%E8%AA%9E%E7%89%88Windows%E5%88%A4%E5%AE%9A/"/>
+    <id>https://veltlion.github.io/%E5%8E%BB%E9%99%A4%E3%80%8C%E5%8D%81%E5%85%AD%E5%A4%9C%E3%81%AE%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E3%82%A5%E3%83%BC%E3%83%8A%E3%80%8D%E6%97%A5%E6%9C%AC%E8%AA%9E%E7%89%88Windows%E5%88%A4%E5%AE%9A/</id>
+    <published>2015-07-12T02:43:00.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　前几个月发售的黄油，主题曲是那个走音组合唱的？<br>　　打开之后提示。</p><figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">---------------------------</span><br><span class="line">日本語版Windows判定</span><br><span class="line">---------------------------</span><br><span class="line">This Game is Japan Only</span><br><span class="line">このゲームは日本国内でのみプレイ可能です。</span><br><span class="line">動作させるには 『 日本語版Windows 』 が必要です。</span><br><span class="line">ゲームを終了します。</span><br><span class="line">※このメッセージは Ctrl+C でコピーできます。</span><br><span class="line">---------------------------</span><br><span class="line">确定   </span><br><span class="line">---------------------------</span><br></pre></td></tr></table></figure><p>　　exe没加壳（还好没加。直接用OD载入。<br>　　中文搜索引擎插件–&gt;智能搜索。然后Ctrl+F搜索<code>Windows判定</code> 。双击搜到的那一行，上面有个<code>jnz</code>跳转，把<code>jnz</code>改成<code>jmp</code>或者直接nop掉。下面还有两个类似的跳转，都这样改掉。改完之后保存文件到游戏目录打开就好了。</p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　前几个月发售的黄油，主题曲是那个走音组合唱的？&lt;br&gt;　　打开之后提示。&lt;/p&gt;
+&lt;figure class=&quot;highlight asciidoc&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;---------------------------&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;日本語版Windows判定&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;---------------------------&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;This Game is Japan Only&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;このゲームは日本国内でのみプレイ可能です。&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;動作させるには 『 日本語版Windows 』 が必要です。&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;ゲームを終了します。&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;※このメッセージは Ctrl+C でコピーできます。&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;---------------------------&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;确定   &lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;---------------------------&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;　　exe没加壳（还好没加。直接用OD载入。&lt;br&gt;　　中文搜索引擎插件–&amp;gt;智能搜索。然后Ctrl+F搜索&lt;code&gt;Windows判定&lt;/code&gt; 。双击搜到的那一行，上面有个&lt;code&gt;jnz&lt;/code&gt;跳转，把&lt;code&gt;jnz&lt;/code&gt;改成&lt;code&gt;jmp&lt;/code&gt;或者直接nop掉。下面还有两个类似的跳转，都这样改掉。改完之后保存文件到游戏目录打开就好了。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="十六夜のフォルトゥーナ" scheme="https://veltlion.github.io/tags/%E5%8D%81%E5%85%AD%E5%A4%9C%E3%81%AE%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E3%82%A5%E3%83%BC%E3%83%8A/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>博客从手机挪到VPS啦</title>
+    <link href="https://veltlion.github.io/%E5%8D%9A%E5%AE%A2%E4%BB%8E%E6%89%8B%E6%9C%BA%E6%8C%AA%E5%88%B0VPS%E5%95%A6/"/>
+    <id>https://veltlion.github.io/%E5%8D%9A%E5%AE%A2%E4%BB%8E%E6%89%8B%E6%9C%BA%E6%8C%AA%E5%88%B0VPS%E5%95%A6/</id>
+    <published>2015-04-21T03:32:06.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　备份过程 phpMyAdmin 导出数据库， tar 备份网页目录，然后放到 VPS 上面导入、解压。</p><p>　　（以前的博客是用 anmpp 搭建的 WordPress ，之后申请了一个 haphost 的免费 VPS （现在已经停止服务了）。</p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　备份过程 phpMyAdmin 导出数据库， tar 备份网页目录，然后放到 VPS 上面导入、解压。&lt;/p&gt;
+&lt;p&gt;　　（以前的博客是用 anmpp 搭建的 WordPress ，之后申请了一个 haphost 的免费 VPS （现在已经停止服务了）。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="anmpp" scheme="https://veltlion.github.io/tags/anmpp/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>在 Android 手机上 chroot ArchLinux</title>
+    <link href="https://veltlion.github.io/chroot-archlinux-on-android/"/>
+    <id>https://veltlion.github.io/chroot-archlinux-on-android/</id>
+    <published>2015-04-13T13:46:05.000Z</published>
+    <updated>2021-04-19T13:55:28.899Z</updated>
+    
+    <content type="html"><![CDATA[<p>因为没有电脑，免费的 VPS 连接太慢操作不方便，就想搞个 Linux 在手机上面。</p><span id="more"></span><!-- toc --><h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>先下载 arm 版：<code>https://archlinuxarm.org/about/downloads</code><br>然后手机里面还要有 <code>busybox</code></p><h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><h3 id="创建文件夹并解压"><a href="#创建文件夹并解压" class="headerlink" title="创建文件夹并解压"></a>创建文件夹并解压</h3><p>因为 sdcard 没有办法更改权限所以放到 /data 里面。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">su</span><br><span class="line">mkdir /data/arch</span><br><span class="line">tar xvf ArchLinuxARM-armv7-latest.tar.gz -C  /data/arch/</span><br></pre></td></tr></table></figure><h3 id="chroot-进去"><a href="#chroot-进去" class="headerlink" title="chroot 进去"></a>chroot 进去</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">unset</span> LD_PRELOAD TMPDIR</span><br><span class="line">busybox mount --rbind /dev /data/arch/dev</span><br><span class="line">busybox mount --rbind /proc /data/arch/proc</span><br><span class="line">busybox mount --rbind /sys /data/arch/sys</span><br><span class="line">busybox mount -t tmpfs tmpfs /data/arch/tmp</span><br><span class="line">chroot /data/arch /bin/bash</span><br></pre></td></tr></table></figure><blockquote><p>如果手机里面配置了c4droid的gcc环境变量的的话也要先unset，不然make会一直提示segmentation fault（这个可把我坑惨了）。</p></blockquote><h2 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h2><h3 id="配置-DNS"><a href="#配置-DNS" class="headerlink" title="配置 DNS"></a>配置 DNS</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rm /etc/resolv.conf</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;nameserver 223.5.5.5&quot;</span> &gt; /etc/resolv.conf</span><br><span class="line">chmod 644 /etc/resolv.conf</span><br></pre></td></tr></table></figure><h3 id="换源"><a href="#换源" class="headerlink" title="换源"></a>换源</h3><p><code>echo &#39;Server = http://mirrors.ustc.edu.cn/archlinuxarm/$arch/$repo&#39; &gt; /etc/pacman.d/mirrorlist</code></p><h3 id="设置主机名"><a href="#设置主机名" class="headerlink" title="设置主机名"></a>设置主机名</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> miuna &gt; /etc/hostname</span><br><span class="line">hostname miuna</span><br></pre></td></tr></table></figure><h3 id="source-profile"><a href="#source-profile" class="headerlink" title="source profile"></a>source profile</h3><p><code>source /etc/profile</code></p><h3 id="更新系统"><a href="#更新系统" class="headerlink" title="更新系统"></a>更新系统</h3><p><code>pacman -Syu base-devel</code></p><h3 id="添加普通用户"><a href="#添加普通用户" class="headerlink" title="添加普通用户"></a>添加普通用户</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">userdel alarm <span class="comment">#删除自带的</span></span><br><span class="line">useradd -m -g users -G wheel -s /bin/bash riko</span><br><span class="line">passwd riko</span><br></pre></td></tr></table></figure><h3 id="修改-sudoers-文件"><a href="#修改-sudoers-文件" class="headerlink" title="修改 sudoers 文件"></a>修改 sudoers 文件</h3><p><code>nano -w /etc/sudoers</code><br>添加<br><code>riko ALL=(ALL) ALL</code></p><h2 id="安装-yaourt"><a href="#安装-yaourt" class="headerlink" title="安装 yaourt"></a>安装 yaourt</h2><h3 id="package-query"><a href="#package-query" class="headerlink" title="package-query"></a>package-query</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://aur.archlinux.org/package-query.git</span><br><span class="line"><span class="built_in">cd</span> package-query</span><br><span class="line">makepkg -si</span><br><span class="line"><span class="built_in">cd</span> ..</span><br></pre></td></tr></table></figure><h3 id="yaourt"><a href="#yaourt" class="headerlink" title="yaourt"></a>yaourt</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://aur.archlinux.org/yaourt.git</span><br><span class="line"><span class="built_in">cd</span> yaourt</span><br><span class="line">makepkg -si</span><br><span class="line"><span class="built_in">cd</span> ..</span><br></pre></td></tr></table></figure><p>如果这段 fakeroot 出错了，有可能是手机内核的问题。可以照 Knifefire 说的换用<code>fakeroot-tcp</code>。</p><h2 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h2><h3 id="data-分区权限"><a href="#data-分区权限" class="headerlink" title="data 分区权限"></a>data 分区权限</h3><p>如果 sudo 提示 <code>sudo: effective uid is not 0, is /sbin/sudo on a file system with the &#39;nosuid&#39; option set or an NFS file system without root privileges?</code>的话可以重挂载/data。<br>先退出chroot，然后执行<code>mount -o,remount,suid /data</code></p><h3 id="dev-fd-62-No-such-file-or-directory"><a href="#dev-fd-62-No-such-file-or-directory" class="headerlink" title="/dev/fd/62: No such file or directory"></a>/dev/fd/62: No such file or directory</h3><p>chroot下执行 <code>ln -s /proc/self/fd /dev/fd</code></p><h3 id="网络权限"><a href="#网络权限" class="headerlink" title="网络权限"></a>网络权限</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">groupadd -g 3001 net_bt_admin</span><br><span class="line">groupadd -g 3002 net_bt</span><br><span class="line">groupadd -g 3003 inet</span><br><span class="line">groupadd -g 3004 net_raw</span><br><span class="line">usermod -a -G net_bt_admin,net_bt,inet,net_raw root</span><br><span class="line">usermod -a -G net_bt_admin,net_bt,inet,net_raw riko</span><br><span class="line">newgrp inet</span><br></pre></td></tr></table></figure><h3 id="内置储存权限"><a href="#内置储存权限" class="headerlink" title="内置储存权限"></a>内置储存权限</h3><p>如果把内置储存挂到这里并且用普通用户的话需要配置下。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">groupadd -g 1015 sdcard_rw</span><br><span class="line">groupadd -g 1023 media_rw</span><br><span class="line">groupadd -g 1028 sdcard_r</span><br><span class="line">usermod -a -G sdcard_rw,media_rw,sdcard_r riko</span><br></pre></td></tr></table></figure><p>剩下还有一大堆权限，什么录音的啊，相机的啊，GPS…一大堆。不过好像都用不到。</p><h2 id="完"><a href="#完" class="headerlink" title="完"></a>完</h2><p>如果手机重启后想再次进入只需要重新执行下面的命令就好啦。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">busybox mount -o,remount,suid /data</span><br><span class="line">busybox mount --rbind /dev /data/arch/dev</span><br><span class="line">busybox mount --rbind /proc /data/arch/proc</span><br><span class="line">busybox mount --rbind /sys /data/arch/sys</span><br><span class="line">busybox mount -t tmpfs tmpfs /data/arch/tmp</span><br><span class="line"><span class="built_in">unset</span> LD_PRELOAD TMPDIR</span><br><span class="line">chroot /data/arch /bin/bash</span><br></pre></td></tr></table></figure><p><img src="/images/%E6%A2%93(1).gif" alt="梓(1).gif"></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;因为没有电脑，免费的 VPS 连接太慢操作不方便，就想搞个 Linux 在手机上面。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Android" scheme="https://veltlion.github.io/tags/Android/"/>
+    
+    <category term="Arch Linux" scheme="https://veltlion.github.io/tags/Arch-Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>そら…</title>
+    <link href="https://veltlion.github.io/sora%E2%80%A6/"/>
+    <id>https://veltlion.github.io/sora%E2%80%A6/</id>
+    <published>2015-03-22T10:38:21.000Z</published>
+    <updated>2021-04-19T13:55:28.899Z</updated>
+    
+    <content type="html"><![CDATA[<p>瀨川空の幸せ…………<br>好想杀了右边那个</p><span id="more"></span>![心疼自己](/images/123.jpg)]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;瀨川空の幸せ…………&lt;br&gt;好想杀了右边那个&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+    <category term="空" scheme="https://veltlion.github.io/tags/%E7%A9%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>编译 Android 用的 redsocks</title>
+    <link href="https://veltlion.github.io/cross-compile-redsocks/"/>
+    <id>https://veltlion.github.io/cross-compile-redsocks/</id>
+    <published>2015-02-19T14:13:32.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　因为手机上要用到 redsocks ，从 shadowsocks-android 里面拿出来的 redsocks 不支持 dnstc 。然后就各种 Google 编译了个。我都不知道最后怎么搞成功的。<br>　　如果 NDK 老是出错的话换编译器吧…手机上的 termux 装个 clang 也能编译。</p><span id="more"></span><h3 id="装编译器"><a href="#装编译器" class="headerlink" title="装编译器"></a>装编译器</h3><p>因为第二次用 NDK 编译老是出错，换了个编译器。<br><code>sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu pkg-config-aarch64-linux-gnu</code></p><h3 id="编译-libevent"><a href="#编译-libevent" class="headerlink" title="编译 libevent"></a>编译 libevent</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz</span><br><span class="line">tar xvf libevent-2.1.8-stable.tar.gz</span><br><span class="line"><span class="built_in">cd</span> libevent-2.1.8-stable</span><br><span class="line">./configure \</span><br><span class="line"> --host=aarch64-linux-gnu --prefix=/home/sora/123/libevent</span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"><span class="built_in">cd</span> ..</span><br></pre></td></tr></table></figure><h3 id="编译-redsocks"><a href="#编译-redsocks" class="headerlink" title="编译 redsocks"></a>编译 redsocks</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/darkk/redsocks/archive/release-0.5.tar.gz</span><br><span class="line">tar xvf release-0.5.tar.gz</span><br><span class="line"><span class="built_in">cd</span> redsocks-release-0.5</span><br><span class="line">CC=aarch64-linux-gnu-gcc \</span><br><span class="line">CFLAGS=<span class="string">&quot;-static -I /home/sora/123/libevent/include&quot;</span> \</span><br><span class="line">LDFLAGS=<span class="string">&quot;-L /home/sora/123/libevent/lib&quot;</span> make</span><br></pre></td></tr></table></figure><p>最后 strip 一下减小下体积。<br><code>aarch64-linux-gnu-strip redsocks</code></p><h3 id="完成"><a href="#完成" class="headerlink" title="完成"></a>完成</h3><p>编译完成的文件。<br><a href="/files/redsocks&pdnsd.zip">redsocks&amp;pdnsd.zip</a></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　因为手机上要用到 redsocks ，从 shadowsocks-android 里面拿出来的 redsocks 不支持 dnstc 。然后就各种 Google 编译了个。我都不知道最后怎么搞成功的。&lt;br&gt;　　如果 NDK 老是出错的话换编译器吧…手机上的 termux 装个 clang 也能编译。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Android" scheme="https://veltlion.github.io/tags/Android/"/>
+    
+    <category term="redsocks" scheme="https://veltlion.github.io/tags/redsocks/"/>
+    
+    <category term="交叉编译" scheme="https://veltlion.github.io/tags/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android全局HTTP(S)代理</title>
+    <link href="https://veltlion.github.io/android-global-http-proxy/"/>
+    <id>https://veltlion.github.io/android-global-http-proxy/</id>
+    <published>2015-01-18T15:49:03.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　代理的话，试过 u2nl + dnsp 可是 u2nl 不能转发 https ，dnsp 的话太慢，后来想到了 redsocks ，不过 redsocks 的 dnstc 只能监听一个地址，被共享网络的设备不能解析 DNS 。<br>　　因为联通免流只能通过HTTP(s)代理上网，UDP的包都会费流量。所以就决定直接放个 pdnsd 进去。pdnsd 用来做缓存和把 UDP 的 DNS 查询全部转成 TCP 通过 redsocks 代理出去。(不过这样上网会变慢，感觉得不偿失，不如直接让他通过</p><span id="more"></span><h2 id="本机代理"><a href="#本机代理" class="headerlink" title="本机代理"></a>本机代理</h2><h3 id="redsocks-配置可以这么写"><a href="#redsocks-配置可以这么写" class="headerlink" title="redsocks 配置可以这么写"></a>redsocks 配置可以这么写</h3><figure class="highlight nginx"><figcaption><span>redsocks.conf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">base</span> &#123;</span><br><span class="line"><span class="attribute">log_debug</span> = <span class="literal">off</span>;</span><br><span class="line"><span class="attribute">log_info</span> = <span class="literal">off</span>;</span><br><span class="line"><span class="attribute">daemon</span> = <span class="literal">on</span>;</span><br><span class="line"><span class="attribute">redirector</span> = iptables;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">redsocks</span> &#123;</span><br><span class="line"><span class="attribute">local_ip</span> = <span class="number">0.0.0.0</span>;</span><br><span class="line"><span class="attribute">local_port</span> = <span class="number">65</span>;</span><br><span class="line"><span class="attribute">ip</span> = $HTTP_PROXY;</span><br><span class="line"><span class="attribute">port</span> = $HTTP_PROXY_PORT;</span><br><span class="line"><span class="attribute">type</span> = http-relay;</span><br><span class="line">&#125;</span><br><span class="line"><span class="section">redsocks</span> &#123;</span><br><span class="line"><span class="attribute">local_ip</span> = <span class="number">0.0.0.0</span>;</span><br><span class="line"><span class="attribute">local_port</span> = <span class="number">56</span>;</span><br><span class="line"><span class="attribute">ip</span> = $HTTPS_PROXY;</span><br><span class="line"><span class="attribute">port</span> = $HTTPS_PROXY_PORT;</span><br><span class="line"><span class="attribute">type</span> = http-connect;</span><br><span class="line">&#125;</span><br><span class="line"><span class="section">dnstc</span> &#123;</span><br><span class="line"><span class="attribute">local_ip</span> = <span class="number">127.0.0.1</span>;</span><br><span class="line"><span class="attribute">local_port</span> = <span class="number">5353</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="iptables-规则如下"><a href="#iptables-规则如下" class="headerlink" title="iptables 规则如下"></a>iptables 规则如下</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个规则。</span></span><br><span class="line">iptables -t nat -N PROXY</span><br><span class="line"><span class="comment"># 指定上网用的网卡并把它加到 OUTPUT 。</span></span><br><span class="line">iptables -t nat -A OUTPUT -o <span class="variable">$interface</span> -j PROXY</span><br><span class="line"><span class="comment"># 允许代理地址和本机通过。</span></span><br><span class="line">iptables -t nat -A PROXY -d 127.0.0.1,HTTP_PROXY -j ACCEPT</span><br><span class="line"><span class="comment"># 把 DNS请求 转到 redsocks 。</span></span><br><span class="line">iptables -t nat -A PROXY -p udp --dport 53 -j REDIRECT --to-port 5353</span><br><span class="line"><span class="comment"># HTTP 和 HTTPS 转到 redsocks 。</span></span><br><span class="line"><span class="comment"># iptables -t nat -A PROXY -p tcp --dport 80 -j DNAT --to-destination $HTTP_PROXY:$HTTP_PROXY_PORT</span></span><br><span class="line">iptables -t nat -A PROXY -p tcp --dport 80 -j REDIRECT --to-port 65</span><br><span class="line">iptables -t nat -A PROXY -p tcp --dport 443 -j REDIRECT --to-port 56</span><br><span class="line"><span class="comment"># 其他 TCP 流量转到 redsocks 。</span></span><br><span class="line">iptables -t nat -A PROXY -p tcp -j REDIRECT --to-port 56</span><br><span class="line"><span class="comment"># 非 TCP 的流量随便处理一下。这里是直接 DROP 掉。也可以不加这句让它通过。</span></span><br><span class="line"><span class="comment"># iptables -t nat -A PROXY ! -p tcp -j DROP</span></span><br></pre></td></tr></table></figure><h2 id="共享给其他设备"><a href="#共享给其他设备" class="headerlink" title="共享给其他设备"></a>共享给其他设备</h2><p>　　这样的话就行了。但如果是用数据流量上网要共享给其它手机或电脑的话，被共享的设备不能解析 DNS 。<br>　　这就要用到 pdnsd 了，它可以用 TCP 查询 DNS 。<br>　　需要注意的就是不能用 53 端口，因为会和 Android 自带的 dnsmasq 冲突。<br>　　redsocks 的配置和上面一样。</p><h3 id="pdnsd-的配置文件"><a href="#pdnsd-的配置文件" class="headerlink" title="pdnsd 的配置文件"></a>pdnsd 的配置文件</h3><figure class="highlight nginx"><figcaption><span>pdnsd.conf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">global</span> &#123;</span><br><span class="line"><span class="attribute">perm_cache</span> = <span class="number">4096</span>;</span><br><span class="line"><span class="attribute">run_as</span> = root;</span><br><span class="line">pid_file = /data/p.pid; //pid文件的位置。</span><br><span class="line"><span class="attribute">server_ip</span> = any;</span><br><span class="line"><span class="attribute">server_port</span> = <span class="number">5354</span>;</span><br><span class="line"><span class="attribute">query_method</span> = tcp_only;</span><br><span class="line"><span class="attribute">status_ctl</span> = <span class="literal">on</span>;</span><br><span class="line"><span class="comment">#tcp_server = on;</span></span><br><span class="line"><span class="attribute">min_ttl</span> = <span class="number">1m</span>;</span><br><span class="line"><span class="attribute">max_ttl</span> = <span class="number">1d</span>;</span><br><span class="line"><span class="attribute">paranoid</span> = <span class="literal">on</span>;</span><br><span class="line"><span class="attribute">timeout</span> = <span class="number">30</span>;</span><br><span class="line"><span class="attribute">randomize_recs</span> = <span class="literal">on</span>;</span><br><span class="line"><span class="attribute">daemon</span> = <span class="literal">on</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="section">server</span> &#123;</span><br><span class="line"><span class="attribute">label</span> = DNS;</span><br><span class="line">ip = 8.8.8.8; //要填支持 TCP查询 的 DNS，多个用 , 隔开。</span><br><span class="line"><span class="attribute">port</span> = <span class="number">53</span>;</span><br><span class="line"><span class="attribute">proxy_only</span> = <span class="literal">on</span>;</span><br><span class="line"><span class="attribute">edns_query</span> = <span class="literal">on</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="section">source</span> &#123;</span><br><span class="line">owner=localhost;</span><br><span class="line">serve_aliases=on;</span><br><span class="line">file=/system/etc/hosts;  //导入一下 hosts 。</span><br><span class="line">&#125;</span><br><span class="line">rr &#123; //Windows验证联网用的，右下角黄色感叹号。</span><br><span class="line"><span class="attribute">name</span> = www.msftncsi.com;</span><br><span class="line"><span class="attribute">reverse</span> = <span class="literal">on</span>;</span><br><span class="line"><span class="attribute">a</span> = <span class="number">124.40.53.8</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="iptables-是这样的"><a href="#iptables-是这样的" class="headerlink" title="iptables 是这样的"></a>iptables 是这样的</h3><p>上面的规则的后面再加上</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">iptables -t nat -N TETHER</span><br><span class="line"><span class="comment"># 把来自 192.168.0.0/16 的流量加入规则。</span></span><br><span class="line">iptables -t nat -I PREROUTING -s 192.168.0.0/16 -j TETHER</span><br><span class="line"><span class="comment"># 允许局域网、感叹号和代理通过。</span></span><br><span class="line">iptables -t nat -A TETHER -d 192.168.0.0/16,124.40.53.8,<span class="variable">$HTTP_PROXY</span> -j ACCEPT</span><br><span class="line"><span class="comment"># 把 DNS 请求劫持到 pdnsd 。</span></span><br><span class="line">iptables -t nat -A TETHER -p udp --dport 53 -j REDIRECT --to-port 5354</span><br><span class="line"><span class="comment"># HTTP的转到 redsocks 。</span></span><br><span class="line">iptables -t nat -A TETHER -p tcp --dport 80 -j REDIRECT --to-port 65</span><br><span class="line"><span class="comment"># iptables -t nat -A TETHER -p tcp --dport 80 -j DNAT --to-destination $HTTP_PROXY:$PORT</span></span><br><span class="line"><span class="comment"># 其它 TCP 流量还是用 redsocks 。</span></span><br><span class="line">iptables -t nat -A TETHER -p tcp -j REDIRECT --to-port 56</span><br><span class="line"><span class="comment"># 非 TCP 的流量还是看着办。</span></span><br><span class="line"></span><br></pre></td></tr></table></figure><h2 id="写个脚本"><a href="#写个脚本" class="headerlink" title="写个脚本"></a>写个脚本</h2><p>　　然后写个启动脚本。就是下载之类的会很烫。</p><h2 id="关于-Android-的网卡"><a href="#关于-Android-的网卡" class="headerlink" title="关于 Android 的网卡"></a>关于 Android 的网卡</h2><p>　　因为上面的脚本也有其他人在用，每个人的移动网络网卡名都不一样。所以只好让知道作用名字的网卡直接通过，再把其他的都代理。<br>就像这几个：</p><ul><li>WLAN：wlan0</li><li>便携式WLAN热点：ap0</li><li>USB网络共享：usb0 rndis0</li><li>蓝牙网络共享：bt-pan</li><li>VPN：tun0 （shadowsocks VPN模式绕过中国和局域网可以用。</li></ul>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　代理的话，试过 u2nl + dnsp 可是 u2nl 不能转发 https ，dnsp 的话太慢，后来想到了 redsocks ，不过 redsocks 的 dnstc 只能监听一个地址，被共享网络的设备不能解析 DNS 。&lt;br&gt;　　因为联通免流只能通过HTTP(s)代理上网，UDP的包都会费流量。所以就决定直接放个 pdnsd 进去。pdnsd 用来做缓存和把 UDP 的 DNS 查询全部转成 TCP 通过 redsocks 代理出去。(不过这样上网会变慢，感觉得不偿失，不如直接让他通过&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="Android" scheme="https://veltlion.github.io/tags/Android/"/>
+    
+    <category term="redsocks" scheme="https://veltlion.github.io/tags/redsocks/"/>
+    
+    <category term="代理" scheme="https://veltlion.github.io/tags/%E4%BB%A3%E7%90%86/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>伪静态</title>
+    <link href="https://veltlion.github.io/rewrite/"/>
+    <id>https://veltlion.github.io/rewrite/</id>
+    <published>2014-11-20T21:26:58.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>鼓捣了一晚上，终于把 anmpp 的伪静态弄好了，过几天再申请个免费域名绑上。</p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;鼓捣了一晚上，终于把 anmpp 的伪静态弄好了，过几天再申请个免费域名绑上。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="anmpp" scheme="https://veltlion.github.io/tags/anmpp/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Untitled（二）</title>
+    <link href="https://veltlion.github.io/Untitled2/"/>
+    <id>https://veltlion.github.io/Untitled2/</id>
+    <published>2014-06-25T14:25:47.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　</p><span id="more"></span><!-- toc --><ul><li>想几个名字<ul><li>忻月</li><li>清影 （同下</li><li>莳芸（这个感觉有点土 芸芸怎么样？</li><li>筱雨（这个太多人用不要</li><li>沐沐</li><li>露夏（Lucia）</li><li>露晞（露晞明朝更复落）</li></ul></li></ul><ul><li>梗<ul><li>哥哥女裝坐公交遇到奇怪的男裝女孩</li><li><del>哥哥女裝出門被壞人脫光光，打電話向女同學求助（因為和妹妹吵架不接電話</del></li><li>和妹妹一起做菜，咬手指，</li><li>可不可以和我一起上个厕所？——去死啦！变态！</li><li>为什么男人的泳衣要露出上面两点啊</li><li>我觉得啊，×液这种东西还是要吃喜欢的人的</li><li>哥哥，我刚才刺死一个人，不如杀两个凑一双，你说好吗？</li><li>无头骑士：你想想，头部可以分开的话，不就可以自己吸自己的胸部了？</li><li>有○○就不能当萌妹了吗？你这是性别歧视，我要告你。</li><li>红烧牛肉面真是人类史上最伟大的发明</li><li>我跟男同学走在一起还被人认成过他女朋友…<br>和爸爸去补习班接弟弟还被弟弟的同学说：“xx，快来看，你爸爸妈妈来接你了” 我有那么老么…</li></ul></li></ul><p>　　二</p><p>　　「姐姐，要早点回来唷～」<br>　　「都说了要叫我哥哥啦。」<br>　　「好～好～」<br>　　「真是的。」<br>　　「比起这个，姐姐快要迟到了吧。」<br>　　「啊，得快一点了。拜～」<br>　　「拜拜喽～」<br>　　「妳刚刚又叫我姐姐了吧。」<br>　　「嘿嘿，快点走喽。要迟到了。」<br>　　「呀，妳别推我啊。」<br>　　乓当！门被关上了。<br>　　真是的，像被赶出来一样。<br>　　唉，就算我的声音、长相再怎么像女孩子也不应该叫我姐姐啊。<br>　　「姐姐～加油哦～」<br>　　回过头，我那可爱的妹妹正对我挥着手。<br>　　叫我哥哥啦！你这马鹿妹妹！<br>　　不过那只小东西好像没有听到的样子，继续对我挥着手。<br>　　「有个妹妹其实也不错啊。」我小声嘟囔了一句<br>　　「欸？姐—姐—妳—刚—刚—有—说—什—么—吗？」<br>　　又叫姐姐了，她又叫我姐姐了！还那么大声！我收回刚才的话！<br>　　唉，不管她了。我回过头，装作没听见继续向前走。<br>　　虽然觉得应该回一句话，但一想刚刚她那么大声邻居们和路人肯定都听到了。现在我也被大家一直用奇怪的目光看着。所以还是算了。<br>　　继续向前走，真是的大家怎么都看着我。<br><del datetime="2016-12-21T03:37:02+00:00"><br>　　公交站前。<br>　　“人真多啊，估计又要站着了。”<br>　　车还没到，等车的人们在站牌前站着。<br>　　“是、是，我一定尽快交出。”打着电话的上班族。<br>　　“听说盐又要涨价了，快点买些存着吧。”<br>　　“最近哪儿又地震了啊。”还有聊着日常琐事的街坊大妈们。<br>　　欸，这不是隔壁的Ｃ婶么，被发现就不妙了，快躲起来。<br>　　“听说咱们班的Ａ子好像喜欢二班的Ｂ君呢。”“诶诶？真的吗？”“是啊是啊，我听说。。。”<br>　　这三个女孩子还是小学生吧，年轻真好…正当我在听着小孩子们愉快的话题的时候，忽然感到背后有道视线在盯着我。<br>　　慢慢的回过头，发现有个人在打量着我。<br>　　他穿着黑色的上衣和长裤，戴着一顶鸭舌帽。因为身高的原因，帽檐挡住了看向脸部的视线，不过看下半边脸的话应该还是很帅气的。<br>　　看到我转过头来，他把帽子偏过来，抬起头向我笑了笑。<br>　　诶诶诶？不会是被发现了吧？该怎么办啊…。<br>　　我尴尬地笑了一下后</p><h3 id="行间"><a href="#行间" class="headerlink" title="行间"></a>行间</h3><p>  “是个男的啊男的。”受不了了，回到家。把帽子摔在地上，开始换衣服。<br>  “怎么了啊？”<br>  “是个男孩子！而且胸部还被摸了，嫁不出去了啦！”<br>  脱下外衣，低头看向自己的胸部。<br>  呜，我这丰满的胸部连我把拔都没摸过，就被一个不认识的人揉来揉去。<br>  揉来揉去。<br>  揉来揉去。<br>  “发生什么事了啊。你那个洗衣板再怎么揉也不会变大啦。”<br></del></p><h3 id="见面"><a href="#见面" class="headerlink" title="见面"></a>见面</h3><p>　　「呐，快过来看看你的新妹妹，很可爱吧～ 忻忻，要叫哥哥哦。」<br>　　哇，好可爱的女孩子。我以后就要和她一起生活了吗。<br>　　不敢和她的视线对上，我使劲把目光往旁边移。<br>　　「姐姐～」<br>　　我还是忍不住用余光注视着那个小女孩，她那可爱的小嘴唇动了动，好像说了些什么。<br>　　「快点答应啊，妹妹在叫你呢。」母亲见我没说话，便插了一句。<br>　　「诶？a，哎。」<br>　　诶？不对啊，她刚刚叫的好像是姐姐吧。<br>　　「嘿嘿。」<br>　　我用疑惑的目光看向母亲，她正用手捂着嘴。<br>　　「噗哧！你对小女孩没有抵抗力的吧。小时候还带过邻居家亲戚的女孩子来过家里呢。哈哈哈哈～」<br>　　我的脸欻的红了起来。<br>　　「不、要再说了。」我低下头用只有自己能听到的声音嘀咕着。<br>　　「哈哈哈～那妳们两个先一起玩吧，我出去有点事。哈哈哈哈哈～」<br>　　喂！不要把我一个人留下来啊！<br>　　这时妹妹跑过来，看着我的眼睛，接着拉住我的手。<br>　　「呐、姐姐，我们一起来玩吧☆。」<br>　　我完全不知道该怎麼应对。这时想起了关门的声音，看来母亲已经出去了。真是的。<br>　　妹妹张大眼睛看着我…<br>　　我也看着她…<br>　　「好、好的。」努力从嘴里挤出了几个字。<br>　　要不要把她的叫法纠正过来呢。这么一边想一边走着。<br>　　「姐姐，我们来玩吧♪」<br>　　啊，妹妹已经把我拉进了她的房间。<br>　　……<br>　　过了几天我们渐渐熟落起来。<br>　　「妳要叫哥哥哦。」<br>　　「不要，姐姐。」<br>　　「叫我哥哥！」<br>　　「姐姐！姐姐姐姐姐姐！」<br>　　「呜……」</p><p>-end-</p><h3 id="一起做菜-11-17-2016"><a href="#一起做菜-11-17-2016" class="headerlink" title="一起做菜 11/17/2016"></a>一起做菜 11/17/2016</h3><p>　　“哦喔，这个还真不错呢。”<br>　　星期天，我和妹妹腻在沙发上看着烹饪节目。<br>　　“我们来做这个试试吧。”<br>　　倚在我肩膀的妹妹抬头看向我，眼睛一闪一闪。<br>　　“算了吧，要是做出来不好吃不就白忙活了嘛，食材也浪费了。”摇摇头。<br>　　“不试试怎么知道！”妹妹直起身向我喊道。<br>　　这态度转变的还真快。<br>　　“好好好，那就试试看试试看。”<br>　　“嘿嘿。”继续倚在我肩膀上。<br>　　诶？这剧本不对啊。<br>　　“不对啊，我们再来一次。”<br>　　“嗯？怎么了吗？”妹妹歪着头疑惑了一下，不过马上就理解了，调皮地看着我。“啊、我们来做这个试试吧。”<br>　　“算了吧，要是做出来不好吃不就白忙活了嘛，食材也浪费了。”摇摇头。<br>　　“好姐姐，就做一下、做一下嘛。”<br>　　妹妹坐起来把手搭在我胳膊上，摇来摇去。<br>　　摇来摇去。<br>　　“嗯—这还差不多嘛…诶？姐姐？”<br>　　听到我这句话，妹妹把我摇来摇去的胳膊使劲一甩。直起身，插起腰，嘟起嘴，脸蛋显得鼓鼓的。<br>　　“你到底是做还是不做？”<br>　　你这到底是想做还是不想做啊…不过我倒是想戏弄她一下。<br>　　“那就不做了吧。”尽量用着平淡的语调。<br>　　妹妹愣了一下，大概是没想到我会这么说吧。<br>　　“喔…”妹妹失落地倒在沙发上，双目无神地看着烹饪节目。<br>　　本来只是想戏弄一下她的，是不是做得有点过了。哄一下她，然后一起试试看吧。<br>　　”那我们中午就望饭止饿吧。”妹妹继续失神地盯着电视。<br>　　“诶诶诶！？”不对啊，剧情好像在预定的轨道上偏离得越来越远了。<br>　　“那我们就来试试吧，试试吧。”我可不想再饿肚子了。<br>　　妹妹侧着头，把手放在耳边。<br>　　“姐—姐—你—说—什—么—？大—声—一—点—，我～听～不～到～”<br>　　你是故意的吧？故意的吧！不过为了今天的午餐，也只好配合一下了。<br>　　“我—是—说—，电—视—上—面—那—道—菜—好—像—很—好—吃—的—样—子—，我—们—做—试—试—看—吧—。”这样说话好累。<br>　　“算了吧，要是做出来不好吃不就白忙活了嘛，食材也浪费了。摇摇头。”<br>　　装作我刚刚的语气，然后还摇了摇头。<br>　　“好妹妹，我世界上最可爱的妹妹，求你了，我们就做一下嘛，做一下。“<br>　　忍着笑，照着妹妹刚才的动作摇摇她的胳膊。<br>　　只见她插着腰，挺起小小的胸部，昂起头。<br>　　“哼哼，这可是你求我的哦。我就勉为其难地和你做你一下吧。哈哈。”小小的虎牙在那神气的笑容里若隐若现。<br>　　“是是是，妹妹大人最好了。”<br>　　然后迈着兴奋的小跳步跑进厨房，真是败给她了。</p><ul><li>03/06/2020<br>  “啊、好痛。”<br>  菜刀啪的一声落在案板上，妹妹背对着我，右手半捂着左手，望过去还能隐约看到一些红色。<br>  “好痛啊，呜呜呜…”<br>  我担心地走到妹妹身旁，弯下腰打算查看一下情况。<br>  “你怎么这么不小心啊，我看看。”<br> 她突然转过身，用手快速地在我的脸上抹了一下。<br>“啊，这是什么呀！”<br>我疑惑地摸了一下妹妹刚刚抹过的地方，湿湿软软的。把手指放进嘴里，一股酸酸甜甜的味道在舌尖上化开。<br> 就在我沉浸在番茄酱的美味中时，妹妹悄悄趁机逃开，在离我一段距离之后停下，背着双手，又露出那小小的虎牙笑着看向我。<br>“嘿嘿嘿。”</li><li>“哼，还是我来切吧，你去洗菜，真怕你真出了什么意外。”我装着生气的样子对妹妹说。<br>“唔…好吧。”妹妹像做错事一样低下头。<br>我背过身，拿起菜刀继续切菜。<br>“那姐姐可要小心些喔。”妹妹偷笑着开启水龙头开始洗菜。<br>过了一会，我悄悄地在手上抹上了番茄酱，然后啪的一声把菜刀放在案板上。<br>大喊一声！<br>“啊！好痛啊。”捂住手指。<br>妹妹听到后连忙跑过来。<br>“你怎么这么不小心啊，我看看。”讲出和我上次一模一样的话。<br>嘿嘿嘿，机会来了。<br>我转过身，伸出手，打算把番茄酱抹在她的脸上。<br>“哈哈哈，叫你刚才……”<br>就在快要接触到她那软乎乎的小脸时，妹妹忽然张大了嘴，一口含住了我的手指，用她那水灵灵的大眼睛狡猾地仰视着我。<br>妹妹的嘴里面软软的，整根手指被一股奇妙的感觉包裹着。<br>“啊…”<br>妹妹看到我惊讶的样子更加得意了，她含着手指，动用舌头绕着手指转了转，吮干了番茄酱，并轻轻地咬了一下。</li></ul><h3 id="姐姐-2016-12-31-周六"><a href="#姐姐-2016-12-31-周六" class="headerlink" title="姐姐 2016/12/31 (周六)"></a>姐姐 2016/12/31 (周六)</h3><p>  怎么办啊怎么办啊，对了，给妈妈打电话。<br>  “妈妈，哥哥真的变成姐姐了！”<br>  ‘嗯？怎么回事啊？’<br>  “都怪我平时老是叫他姐姐姐姐的，结果真变成姐姐了。怎么办啊”<br>  ‘噗哧。你平时不是一直叫姐姐的吗，怎么真变成姐姐你又不要了？’<br>  “可是…呜…可是哥哥…”</p><p>  妹妹从房间跑出去就一直哭，有时候还会跺脚。<br>  过了一会，妹妹趴在房间门口向这里偷看，眼睛红红的，眼角还留有哭过的痕迹。<br>  “怎么还哭了啊，过来让我看看。”<br>  妹妹低着头走到门中央，双手垂握在身前，像是做错了什么事情一样，扭扭捏捏就是不肯过来。<br>  “姐姐，对不起！”突然抬起头，眼角还含着眼泪，一副要哭出来的样子。</p><del datetime="2014-06-27T12:44:22+00:00">/* 备用（不要读）：　　话说这只妹妹也是最近才和我一起生活的，我父母在我很小的时候就离婚了，我一直在父亲这边生活，母亲好像也结婚了的样子。不过父亲在半年前去世了。我就被几年未见的母亲接过去生活，遇到了现在这只不知道有没有血缘关系的妹妹。母亲的现任丈夫好像很讨厌我的样子，不过现在已经没关系了。他们两人在寒假的时候把我和妹妹丢下去旅游因为空难死掉了，好象是叫做什么370的航班。现在家里只剩下我和妹妹，靠着保险金和祖父母的接济过活。*/</del><p>　　<br>　　「发现体重秤！我现在有多重呢？」<br>　　大多数人看到体重秤第一件联想到的事情肯定是自己的体重， 也不例外。然后第二件嘛…<br>　　「诶？多少多少？」<br>　　就是量体重罗。<br>　　看不到啊，看不到下面的数字啊。蹲下来，挽起落下挡在眼前的长发。睁眼看去，模模糊糊，好像是51.xx。<br>　　「咦？！？！52kg不到？」<br>　　不会吧，前两个月还是57kg的，我怎么瘦得这么快。<br>　　这件事一定要和妹妹显摆一下才行。<br>　　下午，回到家就看到那妹妹又躺在沙发上面吃着零食看着电视。真是没规矩，都提醒过多少次了，还这样。<br>　　不过现在这些不重要啦。<br>　　「柚子，你看我又瘦了哦，才52千克不到～」<br>　　妹妹正吃着零食，听到我回来，猛嚼了几口，迅速把零食袋放在一边。起身坐在沙发上，抚了一下裙摆，手放两旁，端端正正做好。目光飘忽不定地看向我，又迅速转向地面。<br>　　在我打量着她，想着该如何应对时。她却突然回过头来，瞪着那黑亮亮的眼睛看向我。<br>　　「k、看很么看！」<br>　　「你先把嘴里的东西嚼干净咽下去再说话！」<br>　　「唔…」的一声嘟起嘴，嚼了几下，扬起头，咽。<br>　　「这下你没话说了吧？我可是有好好坐好。」<br>　　「你刚刚明明还躺在沙发上吃零食…算了，不说这个…」<br>　　「哪有啊，你看你看，我的坐姿多标准…」<br>　　「我今天称了一下只有52kg不到～」<br>　　「裙子也有好好盖住，也没有…52kg！会不会太瘦了一点，来来来，让我抱抱，看看还抱不抱得动。」<br>　　妹妹在我身边转来转去，伸手就要抱。<br>　　「去去去，真没规矩。」<br>　　「前几天还是57kg，怎么可能会突然轻这么多…」</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　&lt;/p&gt;</summary>
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>21</title>
+    <link href="https://veltlion.github.io/21/"/>
+    <id>https://veltlion.github.io/21/</id>
+    <published>2014-06-24T15:00:10.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>手机摔了一下把震动摔坏了555。。。</p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;手机摔了一下把震动摔坏了555。。。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/tags/%E6%97%A5%E5%B8%B8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>18</title>
+    <link href="https://veltlion.github.io/18/"/>
+    <id>https://veltlion.github.io/18/</id>
+    <published>2014-06-23T07:28:07.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>啊啊～</p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;啊啊～&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/categories/%E6%97%A5%E5%B8%B8/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Untitled</title>
+    <link href="https://veltlion.github.io/Untitled/"/>
+    <id>https://veltlion.github.io/Untitled/</id>
+    <published>2014-06-21T09:26:48.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　</p><span id="more"></span><pre><code>写给自己看的小说。「把妄想的东西写下来吧！应该会很有趣的！」心里这么想着。</code></pre><p>　　一</p><p>　　发现一张墙纸！好奇怪的墙纸啊，上面画有很多奇怪图案。图案拼凑起来又有点像门的形状。<br>　　「管他那么多，贴上去再说。」<br>　　我站起身，把那张墙纸按在墙上。<br>　　「哼哼，墙纸就应该贴在墙上嘛～」我插起腰，得意地说。<br>　　（可是为什么是墙纸呢，还有可能是别的什么东西哦。）<br>　　「直觉告诉我它就是墙纸啦！墙纸！直觉！」<br>　　（好好好，可是妳要一直这么按着么，找个东西固定下吧。）<br>　　「诶？也是啊。可是要拿什么固定呢，唔——」<br>　　一边把左手食指按在嘴唇上一边歪着头这样想着。<br>　　「那么，用这个好了！」<br>　　我把手伸向固定窗帘用的钉子。<br>　　（要用那个吗？妳晚上不是还要用到？）<br>　　「晚上的事留到晚上再说啦。话说妳是谁啊，从刚刚开始就一直……」<br>　　我回过头，却什么也没发现。<br>　　「屋子里果然还是我一个人啊。」<br>　　（……）<br>　　嘛，不管她了。<br>　　「拔钉钉～拔钉钉～」现在最重要的是把钉子取下来。<br>　　（果然女孩子要用第三人称才能变可爱啊。）<br>　　不理那个声音。用力捏住钉子，往后用力一扯～<br>　　……<br>　　钉子直接从手里滑出来，钉冒划到手指了。<br>　　……<br>　　扑通一声坐在床上。<br>　　……<br>　　「啊，好痛啊啊啊。」<br>　　好痛啊啊唔啊，迅速把手指含在嘴里。<br>　　「我、我才没有哭哦？」不知怎么回事，很想说句这样的台词。<br>　　（妳的眼角明明在含泪。）<br>　　哼！<br>　　反正也没人安慰我。真的很痛啦。<br>　　「这下要怎么办呢～」我看向墙纸。<br>　　诶——？不是一直好好的在墙上嘛。根本没有掉下来！非常生气！嗯，生气！<br>　　「到底是那个傻爪要我用钉子固定的！」这样喊了出来。<br>　　（说固定的是我没错啦，可是拔钉子的时候我有劝过妳对吧？还有妳那个瓜绝对是故意打错的！故意的！喂！别一直看着墙纸(?)啊，好好听人家说话！哼！）<br>　　那个墙纸真的好奇怪啊，好奇怪。嗯，好奇怪！<br>　　我睁大眼睛仔细看着。仿佛被吸引了般伸出右手，触碰了那张墙纸像门的墙纸……<br>　　……<br>　　……<br>　　（什么都不会发生哦～）<br>　　「什么嘛！」<br>　　根本什么都没发生嘛！害我白期待了。<br>　　我又用力戳了戳那张纸，于是……门开了。<br>　　……<br>　　……<br>　　（！？）<br>　　「诶诶诶诶！？」<br>　　门开了，就如同字面上描述的一样。</p><p>　　那张墙纸上的门被打开了……</p><p>　　门被打开了。<br>　　「什么嘛，原来可以打开啊。」我用右手手指卷弄着头发。<br>　　（哦，可以打开啊。）<br>　　手扒在门框上，往里面窥探。<br>　　里面一片漆黑。什么都看不到。<br>　　把手伸进去。<br>　　挥一挥。<br>　　空的，很大。<br>　　「这该不会是什么通往异世界的门之类的老套设定吧。」嘟起嘴。<br>　　（就是这么老套哦～）<br>　　虽然这么说，但我心里还是很期待的。这样不是超有趣的吗？而且还可以离开这个无聊的世界。<br>　　我把手缩回来，站直身体。左手叉腰，右手放在门框（墙纸？上的）上。<br>　　「那么，去里面看看吧。我一边这么说一边挺起我那丰满的胸部。」嗯、嗯。我使劲点了点头。<br>　　（喂喂！妳那洗衣板哪里丰满了！还有心里想的不要说出来！！）<br>　　诶？刚刚好像有人说话啊。<br>　　好，去里面看看吧。<br>　　「首先是穿衣服～衣服～内衣～胖次～」我一边说着一边到处翻动。<br>　　（诶？没有穿吗……快去穿啦！还有女孩子不要说胖次这种词啦！）<br>　　「啊，找到了。」<br>　　拿起浅蓝色的内衣放在胸前比一比，扔掉。<br>　　「我果然不习惯穿这种东西啊，小裤裤～小裤裤～」我伏下身子继续找。<br>　　（是妳胸部太小根本不需要吧！）<br>　　总感觉听到了让人很火大的话。<br>　　我把小裤裤拿起来，弯下腰。啊，头发垂下来了。抬起左腿。雪白雪白的腿穿过内裤，软软的，滑滑的。接着右腿～<br>　　好，用力提起来。<br>　　「啊～」<br>　　低下头俯视自己的身体，丰满(？)的胸部，白白微鼓的肚皮，浅绿色的小裤裤，雪白的腿。<br>　　不禁用左手按住胸部，右手抚摸肚肚。<br>　　抚摸抚摸～<br>　　抚摸抚摸～<br>　　哈～好软～♪<br>　　脸上流露出幸福的表情。<br>　　「啊，多么美妙的身体。我都要爱上妳了，请和我结婚吧！♥」<br>　　（え？わ、私？讨厌、结、结婚什么的。不、不行，这太早了啦。人、人家还没做好准备哦？ 我才没有一边用双手捂着红红的脸颊一边扭动身体哦（？））<br>　　「好的，我们结婚吧！」<br>　　（都说不要了啦！这太——咦 ？？？）<br>　　嗯，从床上拿起红色的运动服。<br>　　「外面就穿这身好了。」<br>　　把手伸进袖子，拉好拉链。<br>　　下床，站在镜子前面拉好下摆。<br>　　浅绿色在运动服下面若隐若现。<br>　　自己不由得看呆了。<br>　　好美！<br>　　「这样穿也不错嘛。」<br>　　回到床上继续把裤子穿好，接着随便找了双鞋子换上。<br>　　「好饿啊。」<br>　　（这不是当然的吗？妳已经有三天没吃东西了吧。还有妳不要一边在床上滚来滚去一边说话啦，衣服会皱的。）<br>　　「我不管啦，好饿好饿的。」<br>　　继续滚来滚去。<br>　　（妳到底想不想去那个里面啊！）<br>　　「那个？哪个啊？」<br>　　那个是什么东西啊。<br>　　（就是那个门里面啊！难道忘记了吗！）<br>　　「啊，那个啊。」<br>　　（真的忘记了…）<br>　　这么说来还真有这个东西啊。<br>　　躺在床上的我向右转了下头。<br>　　黑黑的，打开了的『门』。<br>　　伸出右手，<br>　　挥来挥去。<br>　　挥来挥去。<br>　　想要触摸。可是离得有点远。<br>　　站起来吧。<br>　　扒住洞口爬进去。<br>　　啊，我爬进来了。里面黑黑的。什么都看不到。身体好像在飘着一样。<br>　　突然，怎么说呢。身体像是失去重力一样急速下坠。<br>　　「啊～～～～～」<br>　　（咿咿咿咿～～～）<br>　　该怎么讲呢，失去重力的感觉很奇怪，脑子一片空白，仿佛要拒绝思考一样。给人一种绝望的感觉。<br>　　「我，解脱了啊。」<br>　　（我还不想死啊，救……）</p><p>　　就这样，进入了神秘之门的两人……</p><p>　　死掉了。</p><p>-end-</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;　　&lt;/p&gt;</summary>
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>手滑把数据库删了☆</title>
+    <link href="https://veltlion.github.io/%E6%89%8B%E6%BB%91%E6%8A%8A%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%A0%E4%BA%86%E2%98%86/"/>
+    <id>https://veltlion.github.io/%E6%89%8B%E6%BB%91%E6%8A%8A%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%A0%E4%BA%86%E2%98%86/</id>
+    <published>2014-06-21T09:26:23.000Z</published>
+    <updated>2020-08-30T04:07:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>还好没有发多少文章……</p><span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;还好没有发多少文章……&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
+    
+    
+    <category term="日常" scheme="https://veltlion.github.io/tags/%E6%97%A5%E5%B8%B8/"/>
+    
+  </entry>
+  
+</feed>
