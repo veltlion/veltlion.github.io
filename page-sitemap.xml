@@ -10,8 +10,8 @@
     
     
     <url>
-        <loc>https://veltlion.github.io/404.html</loc>
-        <lastmod>2021-04-19T13:55:28.803Z</lastmod>
+        <loc>https://veltlion.github.io/about/</loc>
+        <lastmod>2021-04-19T16:22:14.886Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -19,7 +19,7 @@
     
     
     <url>
-        <loc>https://veltlion.github.io/about/</loc>
+        <loc>https://veltlion.github.io/404.html</loc>
         <lastmod>2021-04-19T13:55:28.803Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -46,15 +46,6 @@
     
     
     <url>
-        <loc>https://veltlion.github.io/all-archives/</loc>
-        <lastmod>2020-08-30T04:07:34.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    
-    
-    <url>
         <loc>https://veltlion.github.io/all-categories/</loc>
         <lastmod>2020-08-30T04:07:34.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -65,6 +56,15 @@
     
     <url>
         <loc>https://veltlion.github.io/all-tags/</loc>
+        <lastmod>2020-08-30T04:07:34.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    
+    
+    <url>
+        <loc>https://veltlion.github.io/all-archives/</loc>
         <lastmod>2020-08-30T04:07:34.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>

@@ -1,1 +1,756 @@
-<!DOCTYPE html><html class="theme-next pisces" lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#222"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet"><link href="//fonts.cat.net/css?family=Sigmar One:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css" rel="stylesheet"><link href="/css/main.css?v=0.0.4" rel="stylesheet"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=0.0.4"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=0.0.4"><link rel="mask-icon" href="/images/logo.svg?v=0.0.4" color="#222"><meta name="keywords" content="Arch Linux,AUR,"><meta name="description" content="这个以前一直想写来着，不过免费的VPS挂掉了就一直没写。现在正好赶上有一个包需要更新加上博客也迁移成功，就事记录一下。省的以后更新包的时候忘记怎么弄。"><meta property="og:type" content="article"><meta property="og:title" content="向AUR提交软件包"><meta property="og:url" content="https://veltlion.github.io/submitting-packages-to-aur/index.html"><meta property="og:site_name" content="Sora"><meta property="og:description" content="这个以前一直想写来着，不过免费的VPS挂掉了就一直没写。现在正好赶上有一个包需要更新加上博客也迁移成功，就事记录一下。省的以后更新包的时候忘记怎么弄。"><meta property="og:locale"><meta property="og:image" content="https://veltlion.github.io/images/y09.png"><meta property="article:published_time" content="2016-04-02T10:26:39.000Z"><meta property="article:modified_time" content="2021-04-19T13:55:28.901Z"><meta property="article:author" content="空"><meta property="article:tag" content="Arch Linux"><meta property="article:tag" content="AUR"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://veltlion.github.io/images/y09.png"><script id="hexo.configurations">var NexT=window.NexT||{},CONFIG={root:"",scheme:"Pisces",version:"0.0.4",sidebar:{position:"right",display:"always",offset:52,b2t:!1,scrollpercent:!1,onmobile:!1},fancybox:!0,tabs:!0,motion:{enable:!1,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},since:"6/21/2014 17:26:48",onlineAPI:"",site:{title:"",subtitle:"",author:""},duoshuo:{userId:"0",author:"博主"},algolia:{applicationID:"",apiKey:"",indexName:"",hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}},leancloud:{enable:!1,appID:"",appKey:""},favicon:{visibilitychange:!0,narmal:"/images/favicon.ico",hidden:"/images/failure.ico",show_text:"(/≧▽≦/)咦！又好了！",hide_text:"(●—●)喔哟，崩溃啦！"}}</script><script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script><link rel="canonical" href="https://veltlion.github.io/submitting-packages-to-aur/"><title>向AUR提交软件包 | Sora</title><script>!function(e,a,t,n,g,c,o){e.GoogleAnalyticsObject=g,e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,c=a.createElement(t),o=a.getElementsByTagName(t)[0],c.async=1,c.src="https://www.google-analytics.com/analytics.js",o.parentNode.insertBefore(c,o)}(window,document,"script",0,"ga"),ga("create","UA-106826273-1","auto"),ga("send","pageview")</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Sora" type="application/atom+xml"></head><body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans"><div class="container sidebar-position-right page-post-detail"><header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="menu-item-icon fas fa-fw fa-home"></i><br> 首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="menu-item-icon fas fa-fw fa-archive"></i><br> 归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="menu-item-icon fas fa-fw fa-transgender-alt"></i><br> 关于</a></li><li class="menu-item search"><form class="search-form"> <input name="keyword" type="text" class="search-input" placeholder="站内搜索"> <button type="submit" class="search-submit"><i class="fas fa-search"></i></button></form></li></ul></nav><div class="site-brand-wrapper" style="background-image:url(/images/header2.jpg)"><div class="site-meta"><div class="custom-logo-site-title"><div class="brand"><span class="logo-line-before"><i></i></span><div class="site-title"><div id="animate" class="animate"> <span>S</span><span>o</span><span>r</span><span>a</span></div><div id="guide" class="guide"> <span>S</span><span>o</span><span>r</span><span>a</span></div></div><span class="logo-line-after"><i></i></span></div></div><p class="site-subtitle"></p></div><div class="site-nav-toggle"> <button><span class="btn-bar"></span><span class="btn-bar"></span><span class="btn-bar"></span></button></div></div><div class="site-master" itemprop="author" itemscope itemtype="http://schema.org/Person"> <img class="site-master-avatar" itemprop="image" src="/images/sora.jpg" alt=""><h2 class="site-master-description" itemprop="description"> 𝐿𝑒𝓉 𝓁𝒾𝒻𝑒 𝒷𝑒 𝒷𝑒𝒶𝓊𝓉𝒾𝒻𝓊𝓁 𝓁𝒾𝓀𝑒 𝓈𝓊𝓂𝓂𝑒𝓇 𝒻𝓁𝑜𝓌𝑒𝓇𝓈.</h2></div></div></header><main id="main" class="main"><div class="main-inner"><div class="content-wrap"><div id="content" class="content"><div id="posts" class="posts-expand"><article class="post post-type-normal" itemscope itemtype="http://schema.org/Article"><div class="post-date"><div class="post-month">04月</div><div class="post-day">02</div></div><div class="post-block"><link itemprop="mainEntityOfPage" href="https://veltlion.github.io/submitting-packages-to-aur/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="name" content=""><meta itemprop="description" content=""><meta itemprop="image" content="/images/sora.jpg"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="Sora"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">向AUR提交软件包</h1><div class="post-meta"><span class="post-time"><span class="post-meta-item-icon"><i class="far fa-calendar-alt"></i></span> <span class="post-meta-item-text">发表于</span> <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-02T18:26:39+08:00">04-02-2016</time></span><div class="post-wordcount"> <span class="post-meta-divider">•</span><span class="post-meta-item-icon"><i class="far fa-file-word"></i></span> <span class="post-meta-item-text">字数统计&#58;</span> <span title="字数统计">728</span></div></div></header><div class="post-body" itemprop="articleBody"><p>　　这个以前一直想写来着，不过免费的VPS挂掉了就一直没写。现在正好赶上有一个包需要更新加上博客也迁移成功，就事记录一下。省的以后更新包的时候忘记怎么弄。</p><span id="more"></span><h2 id="官方wiki上的介绍"><a href="#官方wiki上的介绍" class="headerlink" title="官方wiki上的介绍"></a>官方wiki上的介绍</h2><p>　　Arch用户软件仓库（Arch User Repository，AUR）是为用户而建、由用户主导的Arch软件仓库。AUR中的软件包以软件包生成脚本（PKGBUILD）的形式提供，用户自己通过makepkg生成包，再由pacman安装。创建AUR的初衷是方便用户维护和分享新软件包，并由官方定期从中挑选软件包进入community仓库。</p><h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>　　首先，需要一个AUR的帐户，打开 <code>https://aur.archlinux.org/register/</code> 注册。</p><h2 id="密钥"><a href="#密钥" class="headerlink" title="密钥"></a>密钥</h2><h3 id="生成密钥"><a href="#生成密钥" class="headerlink" title="生成密钥"></a>生成密钥</h3><p>　　wiki上面要求创建一个新的密钥(而不是用旧的)，这样出问题时可以直接废除密钥。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;your@mail.com&quot;</span></span><br><span class="line">---------------------------------------------</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file <span class="keyword">in</span> <span class="built_in">which</span> to save the key (/home/sora/.ssh/id_rsa):</span><br><span class="line"><span class="comment">#这里输入密钥的路径和名字，像是：/home/yourname/.ssh/aur_rsa</span></span><br><span class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase):</span><br><span class="line"><span class="comment">#私钥密码，可以为空。</span></span><br><span class="line">Enter same passphrase again:</span><br><span class="line"><span class="comment">#然后他就会告诉你生成的私钥和公钥的位置。</span></span><br><span class="line">Your identification has been saved <span class="keyword">in</span> /home/sora/.ssh/aur_rsa.</span><br><span class="line">Your public key has been saved <span class="keyword">in</span> /home/sora/.ssh/aur_rsa.pub.</span><br><span class="line"><span class="comment">#然后下面就是密钥指纹。</span></span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:kGYIbfFJhcdvCLftFuJDgGbRwbesMSd1+cHtMFRBOvg</span><br><span class="line">The key<span class="string">&#x27;s randomart image is:</span></span><br><span class="line"><span class="string">+---[RSA 2048]----+</span></span><br><span class="line"><span class="string">|  ..o*o=.  +.++. |</span></span><br><span class="line"><span class="string">|   .*+*o* o.=..  |</span></span><br><span class="line"><span class="string">|   +. BO B..o=   |</span></span><br><span class="line"><span class="string">|     o+.O =....  |</span></span><br><span class="line"><span class="string">|       OS+ .E    |</span></span><br><span class="line"><span class="string">|      . o o      |</span></span><br><span class="line"><span class="string">|         o       |</span></span><br><span class="line"><span class="string">|                 |</span></span><br><span class="line"><span class="string">|                 |</span></span><br><span class="line"><span class="string">+----[SHA256]-----+</span></span><br><span class="line"><span class="string"></span></span><br></pre></td></tr></table></figure><h3 id="添加到AUR"><a href="#添加到AUR" class="headerlink" title="添加到AUR"></a>添加到AUR</h3><p>　　登录刚刚注册的AUR用户，点击我的帐户。把刚刚生成的aur_rsa.pub文件的内容粘贴到 SSH Public Key 的框框里面。然后更新。</p><h3 id="修改SSH配置"><a href="#修改SSH配置" class="headerlink" title="修改SSH配置"></a>修改SSH配置</h3><p>　　如果不修改SSH配置文件的话，SSH是找不到刚刚新建的密钥的。<br>　　编辑~/.ssh/config文件。</p><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># AUR</span></span><br><span class="line">Host aur</span><br><span class="line">  HostName aur.archlinux.org</span><br><span class="line">  Port <span class="number">22</span></span><br><span class="line">  <span class="keyword">User</span> <span class="title">aur</span></span><br><span class="line">  IdentityFile ~/.ssh/aur_rsa <span class="comment">#私钥路径</span></span><br></pre></td></tr></table></figure><p>　　这样写就像是别名一样，之后可以用 aur 代替 HostName 的 aur.archlinux.org 。</p><h2 id="提交PKGBUILD"><a href="#提交PKGBUILD" class="headerlink" title="提交PKGBUILD"></a>提交PKGBUILD</h2><h3 id="创建仓库"><a href="#创建仓库" class="headerlink" title="创建仓库"></a>创建仓库</h3><p>　　克隆不存在的仓库会自动创建此仓库。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://aur/package_name.git</span><br></pre></td></tr></table></figure><p>　　这时当前目录会多出一个以软件包名命名的目录，接着把PKGBUILD之类的文件放到里面并cd进去。</p><h3 id="提交或更新"><a href="#提交或更新" class="headerlink" title="提交或更新"></a>提交或更新</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">makepkg --printsrcinfo &gt; .SRCINFO     <span class="comment">#生成.SRCINFO</span></span><br><span class="line">git add PKGBUILD .SRCINFO             <span class="comment">#添加文件</span></span><br><span class="line">git commit -m <span class="string">&#x27;更新信息&#x27;</span>               <span class="comment">#提交文件到本地库</span></span><br><span class="line">git push                              <span class="comment">#推送到AUR</span></span><br><span class="line"></span><br></pre></td></tr></table></figure><p>　　.SRCINFO是记录软件包元数据的文件，AUR工具和网站后端需要。并且每次提交或是更新前都需要生成。</p><h2 id="大功告成"><a href="#大功告成" class="headerlink" title="大功告成"></a>大功告成</h2><p>　　这样的话一个软件包就提交完成了。（当初为了这个包在网上查来查去查了好久<br>　　更新的包叫<code>kde-thumbnailer-epub</code>，是dolphin用来显示ePub文件缩略图的软件。喜欢看书的我怎么能容忍ePub没有封面呢。</p><p><img src="/images/y09.png" alt="阿卡林~"></p></div><div class="post-share">分享到：</div><footer class="post-footer"><div class="post-tags"> <a href="/tags/Arch-Linux/" rel="tag"># Arch Linux</a> <a href="/tags/AUR/" rel="tag"># AUR</a></div><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/switch-to-hexo/" rel="next" title="换用Hexo了"><i class="fas fa-chevron-left"></i> 换用Hexo了</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"> <a href="/hexo-md-rename/" rel="prev" title="Hexo 的 md 文件重命名">Hexo 的 md 文件重命名<i class="fas fa-chevron-right"></i></a></div></div></footer></div></article><div class="post-spread"></div></div></div></div><div class="sidebar-toggle"><div class="sidebar-toggle-line-wrap"><span class="sidebar-toggle-line sidebar-toggle-line-first"></span><span class="sidebar-toggle-line sidebar-toggle-line-middle"></span><span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id="sidebar" class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap"> 文章目录</li><li class="sidebar-nav-overview" data-target="site-overview-wrap"> 站点概览</li></ul><section class="site-overview-wrap sidebar-panel"><div class="site-overview"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"> <img class="site-author-image" itemprop="image" src="/images/sora.jpg" alt=""><p class="site-author-name" itemprop="name">Sora</p><p class="site-description motion-element" itemprop="description">好累呀</p></div><div class="links-of-author motion-element"> <span class="links-of-author-item scaleup"><a href="mailto:&#115;&#111;&#114;&#97;&#64;&#108;&#105;&#118;&#101;&#46;&#106;&#112;" target="_blank" title="Email"><i class="far fa-envelope" style="color:#555"><span>Email</span></i></a></span> <span class="links-of-author-item scaleup"><a href="https://twitter.com/yume1001" target="_blank" title="Twitter"><i class="fab fa-twitter" style="color:#2fb0ec"><span>空</span></i></a></span> <span class="links-of-author-item scaleup"><a href="https://t.me/soratan" target="_blank" title="Telegram"><i class="fab fa-telegram" style="color:#41aade"><span>花</span></i></a></span> <span class="links-of-author-item scaleup"><a href="/atom.xml" target="_blank" title="RSS"><i style="fill:#f78422"><svg t="1581190724531" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16212"><path d="M512 0a512 512 0 1 0 512 512A512 512 0 0 0 512 0zm-130.72 736a71.84 71.84 0 0 1-38.72 38.4 74.24 74.24 0 0 1-56.8 0 72.64 72.64 0 0 1-38.4-38.4 73.44 73.44 0 0 1 16-80 72.48 72.48 0 0 1 22.88-16 72.96 72.96 0 0 1 96 96zm192 32a51.84 51.84 0 0 1-88.32-36.64 187.52 187.52 0 0 0-15.2-75.04 194.08 194.08 0 0 0-102.72-102.72 186.72 186.72 0 0 0-75.04-15.2 51.84 51.84 0 0 1 0-103.52 284.64 284.64 0 0 1 115.2 23.52 300.64 300.64 0 0 1 157.76 157.76 284.96 284.96 0 0 1 23.52 115.2 49.92 49.92 0 0 1-15.52 37.44zm195.84 0a51.84 51.84 0 0 1-88.48-36.64 378.72 378.72 0 0 0-13.92-103.2 393.92 393.92 0 0 0-39.2-92.96 389.92 389.92 0 0 0-232.48-177.76 380 380 0 0 0-103.2-13.92 51.84 51.84 0 0 1-36.64-88.48 49.92 49.92 0 0 1 36.48-15.04 483.2 483.2 0 0 1 130.72 17.6 494.08 494.08 0 0 1 344 344 483.2 483.2 0 0 1 17.6 130.72 50.08 50.08 0 0 1-15.2 36.48z" p-id="16213"></path></svg><span>RSS</span></i></a></span></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"> <a href="/archives"><span class="site-state-item-count">38</span> <span class="site-state-item-name">日志</span></a></div><div class="site-state-item site-state-categories"> <span class="site-state-item-count">2</span> <span class="site-state-item-name">分类</span></div></nav></div></section><section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active"><div class="post-toc"><div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%98%E6%96%B9wiki%E4%B8%8A%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">官方wiki上的介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B"><span class="nav-number">2.</span> <span class="nav-text">开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%86%E9%92%A5"><span class="nav-number">3.</span> <span class="nav-text">密钥</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%AF%86%E9%92%A5"><span class="nav-number">3.1.</span> <span class="nav-text">生成密钥</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E5%88%B0AUR"><span class="nav-number">3.2.</span> <span class="nav-text">添加到AUR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9SSH%E9%85%8D%E7%BD%AE"><span class="nav-number">3.3.</span> <span class="nav-text">修改SSH配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4PKGBUILD"><span class="nav-number">4.</span> <span class="nav-text">提交PKGBUILD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%BB%93%E5%BA%93"><span class="nav-number">4.1.</span> <span class="nav-text">创建仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4%E6%88%96%E6%9B%B4%E6%96%B0"><span class="nav-number">4.2.</span> <span class="nav-text">提交或更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%A7%E5%8A%9F%E5%91%8A%E6%88%90"><span class="nav-number">5.</span> <span class="nav-text">大功告成</span></a></li></ol></div></div></section></div></aside></div></main><footer id="footer" class="footer"><div class="footer-image"></div><div class="footer-inner"><p>博客已萌萌哒运行<span id="since"></span><span class="my-face">(●'◡'●)ﾉ♥</span></p><p></p><p>© <span itemprop="copyrightYear">2021</span> Sora. Powered By <a target="_blank" class="external" rel="nofollow">Hexo</a>. Theme By <a target="_blank" class="external" rel="nofollow">Sagiri</a>. <a href="/sitemap.xml" target="_blank">Sitemap</a>.</p><p>Made with<i class="fas fa-heart throb" style="color:#d43f57"></i> by <span class="author" itemprop="copyrightHolder">空</span>.</p></div></footer><div class="back-to-top"><i class="fas fa-arrow-up"></i></div><canvas id="evanyou"></canvas></div><script src="/js/sagiri.min.js?v=0.0.4"></script></body></html>
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.cat.net/css?family=Sigmar One:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+  
+
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css" />
+
+
+
+  
+
+<link href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=0.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=0.0.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=0.0.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Arch Linux,AUR," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这个以前一直想写来着，不过免费的VPS挂掉了就一直没写。现在正好赶上有一个包需要更新加上博客也迁移成功，就事记录一下。省的以后更新包的时候忘记怎么弄。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="向AUR提交软件包">
+<meta property="og:url" content="https://veltlion.github.io/submitting-packages-to-aur/index.html">
+<meta property="og:site_name" content="Sora">
+<meta property="og:description" content="这个以前一直想写来着，不过免费的VPS挂掉了就一直没写。现在正好赶上有一个包需要更新加上博客也迁移成功，就事记录一下。省的以后更新包的时候忘记怎么弄。">
+<meta property="og:locale">
+<meta property="og:image" content="https://veltlion.github.io/images/y09.png">
+<meta property="article:published_time" content="2016-04-02T10:26:39.000Z">
+<meta property="article:modified_time" content="2021-04-19T13:55:28.901Z">
+<meta property="article:author" content="空">
+<meta property="article:tag" content="Arch Linux">
+<meta property="article:tag" content="AUR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://veltlion.github.io/images/y09.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '0.0.4',
+    sidebar: {"position":"right","display":"always","offset":52,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    since: '6/21/2014 17:26:48',
+    onlineAPI: '',
+    site: {
+      title: '',
+      subtitle: '',
+      author: ''
+    },
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    leancloud: {
+      enable: false,
+      appID: '',
+      appKey: ''
+    },
+    favicon: {
+      visibilitychange: true,
+      narmal: '/images/favicon.ico',
+      hidden: '/images/failure.ico',
+      show_text: '(/≧▽≦/)咦！又好了！',
+      hide_text: '(●—●)喔哟，崩溃啦！'
+    }
+  };
+</script>
+
+
+
+  
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+
+
+
+
+  <link rel="canonical" href="https://veltlion.github.io/submitting-packages-to-aur/"/>
+
+
+
+
+
+  <title>向AUR提交软件包 | Sora</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-106826273-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="Sora" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fas fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fas fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fas fa-fw fa-transgender-alt"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+      <li class="menu-item search">
+          <form class="search-form">
+            <input name="keyword" type="text" class="search-input" placeholder="站内搜索">
+            <button type="submit" class="search-submit"><i class="fas fa-search"></i></button>
+          </form>
+      </li>
+      <!--li class="menu-item online"><span id="online-count">?</span>人在线</li-->
+    </ul>
+  
+
+  
+</nav>
+
+<div class="site-brand-wrapper" style="background-image: url(/images/header2.jpg)">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <div class="brand">
+        <span class="logo-line-before"><i></i></span>
+        <div class="site-title">
+          <div id="animate" class="animate">
+            <span>S</span><span>o</span><span>r</span><span>a</span>
+          </div>
+          <div id="guide" class="guide">
+            <span>S</span><span>o</span><span>r</span><span>a</span>
+          </div>
+        </div>
+        <span class="logo-line-after"><i></i></span>
+      </div>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+<div class="site-master" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-master-avatar" itemprop="image" src="/images/sora.jpg" alt="" />
+    <h2 class="site-master-description" itemprop="description">
+        𝐿𝑒𝓉 𝓁𝒾𝒻𝑒 𝒷𝑒 𝒷𝑒𝒶𝓊𝓉𝒾𝒻𝓊𝓁 𝓁𝒾𝓀𝑒 𝓈𝓊𝓂𝓂𝑒𝓇 𝒻𝓁𝑜𝓌𝑒𝓇𝓈.
+    </h2>
+</div>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-date">
+			<div class="post-month">04月</div>
+			<div class="post-day">02</div>
+	</div>
+  
+
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://veltlion.github.io/submitting-packages-to-aur/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/sora.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sora">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">向AUR提交软件包</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar-alt"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-02T18:26:39+08:00">
+                04-02-2016
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                  <span class="post-meta-divider">•</span>
+                
+                <span class="post-meta-item-icon">
+                  <i class="far fa-file-word"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  728
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　这个以前一直想写来着，不过免费的VPS挂掉了就一直没写。现在正好赶上有一个包需要更新加上博客也迁移成功，就事记录一下。省的以后更新包的时候忘记怎么弄。</p>
+<span id="more"></span>
+<h2 id="官方wiki上的介绍"><a href="#官方wiki上的介绍" class="headerlink" title="官方wiki上的介绍"></a>官方wiki上的介绍</h2><p>　　Arch用户软件仓库（Arch User Repository，AUR）是为用户而建、由用户主导的Arch软件仓库。AUR中的软件包以软件包生成脚本（PKGBUILD）的形式提供，用户自己通过makepkg生成包，再由pacman安装。创建AUR的初衷是方便用户维护和分享新软件包，并由官方定期从中挑选软件包进入community仓库。</p>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>　　首先，需要一个AUR的帐户，打开 <code>https://aur.archlinux.org/register/</code> 注册。</p>
+<h2 id="密钥"><a href="#密钥" class="headerlink" title="密钥"></a>密钥</h2><h3 id="生成密钥"><a href="#生成密钥" class="headerlink" title="生成密钥"></a>生成密钥</h3><p>　　wiki上面要求创建一个新的密钥(而不是用旧的)，这样出问题时可以直接废除密钥。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;your@mail.com&quot;</span></span><br><span class="line">---------------------------------------------</span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file <span class="keyword">in</span> <span class="built_in">which</span> to save the key (/home/sora/.ssh/id_rsa):</span><br><span class="line"><span class="comment">#这里输入密钥的路径和名字，像是：/home/yourname/.ssh/aur_rsa</span></span><br><span class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase):</span><br><span class="line"><span class="comment">#私钥密码，可以为空。</span></span><br><span class="line">Enter same passphrase again:</span><br><span class="line"><span class="comment">#然后他就会告诉你生成的私钥和公钥的位置。</span></span><br><span class="line">Your identification has been saved <span class="keyword">in</span> /home/sora/.ssh/aur_rsa.</span><br><span class="line">Your public key has been saved <span class="keyword">in</span> /home/sora/.ssh/aur_rsa.pub.</span><br><span class="line"><span class="comment">#然后下面就是密钥指纹。</span></span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:kGYIbfFJhcdvCLftFuJDgGbRwbesMSd1+cHtMFRBOvg</span><br><span class="line">The key<span class="string">&#x27;s randomart image is:</span></span><br><span class="line"><span class="string">+---[RSA 2048]----+</span></span><br><span class="line"><span class="string">|  ..o*o=.  +.++. |</span></span><br><span class="line"><span class="string">|   .*+*o* o.=..  |</span></span><br><span class="line"><span class="string">|   +. BO B..o=   |</span></span><br><span class="line"><span class="string">|     o+.O =....  |</span></span><br><span class="line"><span class="string">|       OS+ .E    |</span></span><br><span class="line"><span class="string">|      . o o      |</span></span><br><span class="line"><span class="string">|         o       |</span></span><br><span class="line"><span class="string">|                 |</span></span><br><span class="line"><span class="string">|                 |</span></span><br><span class="line"><span class="string">+----[SHA256]-----+</span></span><br><span class="line"><span class="string"></span></span><br></pre></td></tr></table></figure>
+<h3 id="添加到AUR"><a href="#添加到AUR" class="headerlink" title="添加到AUR"></a>添加到AUR</h3><p>　　登录刚刚注册的AUR用户，点击我的帐户。把刚刚生成的aur_rsa.pub文件的内容粘贴到 SSH Public Key 的框框里面。然后更新。</p>
+<h3 id="修改SSH配置"><a href="#修改SSH配置" class="headerlink" title="修改SSH配置"></a>修改SSH配置</h3><p>　　如果不修改SSH配置文件的话，SSH是找不到刚刚新建的密钥的。<br>　　编辑~/.ssh/config文件。</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># AUR</span></span><br><span class="line">Host aur</span><br><span class="line">  HostName aur.archlinux.org</span><br><span class="line">  Port <span class="number">22</span></span><br><span class="line">  <span class="keyword">User</span> <span class="title">aur</span></span><br><span class="line">  IdentityFile ~/.ssh/aur_rsa <span class="comment">#私钥路径</span></span><br></pre></td></tr></table></figure>
+<p>　　这样写就像是别名一样，之后可以用 aur 代替 HostName 的 aur.archlinux.org 。</p>
+<h2 id="提交PKGBUILD"><a href="#提交PKGBUILD" class="headerlink" title="提交PKGBUILD"></a>提交PKGBUILD</h2><h3 id="创建仓库"><a href="#创建仓库" class="headerlink" title="创建仓库"></a>创建仓库</h3><p>　　克隆不存在的仓库会自动创建此仓库。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git://aur/package_name.git</span><br></pre></td></tr></table></figure>
+<p>　　这时当前目录会多出一个以软件包名命名的目录，接着把PKGBUILD之类的文件放到里面并cd进去。</p>
+<h3 id="提交或更新"><a href="#提交或更新" class="headerlink" title="提交或更新"></a>提交或更新</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">makepkg --printsrcinfo &gt; .SRCINFO     <span class="comment">#生成.SRCINFO</span></span><br><span class="line">git add PKGBUILD .SRCINFO             <span class="comment">#添加文件</span></span><br><span class="line">git commit -m <span class="string">&#x27;更新信息&#x27;</span>               <span class="comment">#提交文件到本地库</span></span><br><span class="line">git push                              <span class="comment">#推送到AUR</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>　　.SRCINFO是记录软件包元数据的文件，AUR工具和网站后端需要。并且每次提交或是更新前都需要生成。</p>
+<h2 id="大功告成"><a href="#大功告成" class="headerlink" title="大功告成"></a>大功告成</h2><p>　　这样的话一个软件包就提交完成了。（当初为了这个包在网上查来查去查了好久<br>　　更新的包叫<code>kde-thumbnailer-epub</code>，是dolphin用来显示ePub文件缩略图的软件。喜欢看书的我怎么能容忍ePub没有封面呢。</p>
+<p><img src="/images/y09.png" alt="阿卡林~"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div class="post-share">分享到：</div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Arch-Linux/" rel="tag"># Arch Linux</a>
+          
+            <a href="/tags/AUR/" rel="tag"># AUR</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/switch-to-hexo/" rel="next" title="换用Hexo了">
+                <i class="fas fa-chevron-left"></i> 换用Hexo了
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/hexo-md-rename/" rel="prev" title="Hexo 的 md 文件重命名">
+                Hexo 的 md 文件重命名 <i class="fas fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/sora.jpg"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name">Sora</p>
+              <p class="site-description motion-element" itemprop="description">好累呀</p>
+          </div>
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item scaleup">
+                  <a href="mailto:&#115;&#111;&#114;&#97;&#64;&#108;&#105;&#118;&#101;&#46;&#106;&#112;" target="_blank" title="Email">
+                    
+                       <i class="far fa-envelope" style="color: #555"><span>Email</span></i></a>
+                </span>
+              
+                <span class="links-of-author-item scaleup">
+                  <a href="https://twitter.com/yume1001" target="_blank" title="Twitter">
+                    
+                       <i class="fab fa-twitter" style="color: #2FB0EC"><span>空</span></i></a>
+                </span>
+              
+                <span class="links-of-author-item scaleup">
+                  <a href="https://t.me/soratan" target="_blank" title="Telegram">
+                    
+                       <i class="fab fa-telegram" style="color: #41AADE"><span>花</span></i></a>
+                </span>
+              
+                <span class="links-of-author-item scaleup">
+                  <a href="/atom.xml" target="_blank" title="RSS">
+                    
+                       <i style="fill: #F78422;"><svg t="1581190724531" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16212"><path d="M512 0a512 512 0 1 0 512 512A512 512 0 0 0 512 0z m-130.72 736a71.84 71.84 0 0 1-38.72 38.4 74.24 74.24 0 0 1-56.8 0 72.64 72.64 0 0 1-38.4-38.4 73.44 73.44 0 0 1 16-80 72.48 72.48 0 0 1 22.88-16 72.96 72.96 0 0 1 96 96z m192 32a51.84 51.84 0 0 1-88.32-36.64 187.52 187.52 0 0 0-15.2-75.04 194.08 194.08 0 0 0-102.72-102.72 186.72 186.72 0 0 0-75.04-15.2 51.84 51.84 0 0 1 0-103.52 284.64 284.64 0 0 1 115.2 23.52 300.64 300.64 0 0 1 157.76 157.76 284.96 284.96 0 0 1 23.52 115.2 49.92 49.92 0 0 1-15.52 37.44z m195.84 0a51.84 51.84 0 0 1-88.48-36.64 378.72 378.72 0 0 0-13.92-103.2 393.92 393.92 0 0 0-39.2-92.96 389.92 389.92 0 0 0-232.48-177.76 380 380 0 0 0-103.2-13.92 51.84 51.84 0 0 1-36.64-88.48 49.92 49.92 0 0 1 36.48-15.04 483.2 483.2 0 0 1 130.72 17.6 494.08 494.08 0 0 1 344 344 483.2 483.2 0 0 1 17.6 130.72 50.08 50.08 0 0 1-15.2 36.48z" p-id="16213"></path></svg><span>RSS</span></i></a>
+                </span>
+              
+            
+          </div>
+
+          
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+            
+
+          </nav>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%98%E6%96%B9wiki%E4%B8%8A%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">官方wiki上的介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B"><span class="nav-number">2.</span> <span class="nav-text">开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%86%E9%92%A5"><span class="nav-number">3.</span> <span class="nav-text">密钥</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%AF%86%E9%92%A5"><span class="nav-number">3.1.</span> <span class="nav-text">生成密钥</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E5%88%B0AUR"><span class="nav-number">3.2.</span> <span class="nav-text">添加到AUR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9SSH%E9%85%8D%E7%BD%AE"><span class="nav-number">3.3.</span> <span class="nav-text">修改SSH配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4PKGBUILD"><span class="nav-number">4.</span> <span class="nav-text">提交PKGBUILD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%BB%93%E5%BA%93"><span class="nav-number">4.1.</span> <span class="nav-text">创建仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4%E6%88%96%E6%9B%B4%E6%96%B0"><span class="nav-number">4.2.</span> <span class="nav-text">提交或更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%A7%E5%8A%9F%E5%91%8A%E6%88%90"><span class="nav-number">5.</span> <span class="nav-text">大功告成</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-image"></div>
+      <div class="footer-inner">
+        <p>博客已萌萌哒运行<span id="since"></span><span class="my-face">(●'◡'●)ﾉ♥</span></p>
+<p></p>
+
+<p>© <span itemprop="copyrightYear">2021</span> Sora.
+    Powered By <a  target="_blank" class="external" rel="nofollow">Hexo</a>.
+    Theme By <a target="_blank" class="external" rel="nofollow">Sagiri</a>.
+    <a href="/sitemap.xml" target="_blank">Sitemap</a>.
+    
+</p>
+<p>Made with <i class="fas fa-heart throb" style="color: #d43f57;"></i> by <span class="author" itemprop="copyrightHolder">空</span>. </p>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+        
+      </div>
+    
+
+    <canvas id="evanyou"></canvas>
+    <!--canvas id="live2d" width="150" height="400" class="live2d"></canvas-->
+
+    
+
+  </div>
+
+  <script type="text/javascript" src="/js/sagiri.min.js?v=0.0.4"></script>
+
+  
+
+
+
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
