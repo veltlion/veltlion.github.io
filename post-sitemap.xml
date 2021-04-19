@@ -9,7 +9,7 @@
 
 
     <url>
-        <loc>https://veltlion.github.io/%E6%89%8B%E6%BB%91%E6%8A%8A%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%A0%E4%BA%86%E2%98%86/</loc>
+        <loc>https://veltlion.github.io/18/</loc>
         <lastmod>2021-04-19T16:13:00.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -25,7 +25,7 @@
     </url>
 
     <url>
-        <loc>https://veltlion.github.io/18/</loc>
+        <loc>https://veltlion.github.io/%E6%89%8B%E6%BB%91%E6%8A%8A%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%A0%E4%BA%86%E2%98%86/</loc>
         <lastmod>2021-04-19T16:13:00.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -97,6 +97,14 @@
     </url>
 
     <url>
+        <loc>https://veltlion.github.io/fix-usb-tethering-on-windows/</loc>
+        <lastmod>2021-04-19T16:13:00.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://veltlion.github.io/%E6%8A%8A%E9%94%AE%E7%9B%98%E6%B4%97%E5%9D%8F%E4%BA%86%E2%80%A6/</loc>
         <lastmod>2021-04-19T16:13:00.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -114,14 +122,6 @@
 
     <url>
         <loc>https://veltlion.github.io/hexo-on-android/</loc>
-        <lastmod>2021-04-19T16:13:00.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://veltlion.github.io/fix-usb-tethering-on-windows/</loc>
         <lastmod>2021-04-19T16:13:00.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -161,7 +161,7 @@
     </url>
 
     <url>
-        <loc>https://veltlion.github.io/change-uefi-boot-logo/</loc>
+        <loc>https://veltlion.github.io/%E5%A4%9A%E8%AF%B4%E8%BD%AC%20Disqus%20%E7%9A%84%E5%9D%91/</loc>
         <lastmod>2021-04-19T16:13:00.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -169,7 +169,7 @@
     </url>
 
     <url>
-        <loc>https://veltlion.github.io/%E5%A4%9A%E8%AF%B4%E8%BD%AC%20Disqus%20%E7%9A%84%E5%9D%91/</loc>
+        <loc>https://veltlion.github.io/change-uefi-boot-logo/</loc>
         <lastmod>2021-04-19T16:13:00.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -257,14 +257,6 @@
     </url>
 
     <url>
-        <loc>https://veltlion.github.io/switch-to-hexo/</loc>
-        <lastmod>2021-04-19T13:55:28.901Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://veltlion.github.io/submitting-packages-to-aur/</loc>
         <lastmod>2021-04-19T13:55:28.901Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -273,8 +265,8 @@
     </url>
 
     <url>
-        <loc>https://veltlion.github.io/sora%E2%80%A6/</loc>
-        <lastmod>2021-04-19T13:55:28.899Z</lastmod>
+        <loc>https://veltlion.github.io/switch-to-hexo/</loc>
+        <lastmod>2021-04-19T13:55:28.901Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -282,6 +274,14 @@
 
     <url>
         <loc>https://veltlion.github.io/chroot-archlinux-on-android/</loc>
+        <lastmod>2021-04-19T13:55:28.899Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://veltlion.github.io/sora%E2%80%A6/</loc>
         <lastmod>2021-04-19T13:55:28.899Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
