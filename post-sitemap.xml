@@ -121,7 +121,7 @@
     </url>
 
     <url>
-        <loc>https://veltlion.github.io/21/</loc>
+        <loc>https://veltlion.github.io/18/</loc>
         <lastmod>2020-08-30T04:07:36.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -129,7 +129,7 @@
     </url>
 
     <url>
-        <loc>https://veltlion.github.io/18/</loc>
+        <loc>https://veltlion.github.io/21/</loc>
         <lastmod>2020-08-30T04:07:36.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -145,7 +145,7 @@
     </url>
 
     <url>
-        <loc>https://veltlion.github.io/cross-compile-redsocks/</loc>
+        <loc>https://veltlion.github.io/android-global-http-proxy/</loc>
         <lastmod>2020-08-30T04:07:36.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -153,7 +153,7 @@
     </url>
 
     <url>
-        <loc>https://veltlion.github.io/android-global-http-proxy/</loc>
+        <loc>https://veltlion.github.io/cross-compile-redsocks/</loc>
         <lastmod>2020-08-30T04:07:36.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
