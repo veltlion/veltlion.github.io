@@ -49,9 +49,9 @@
     <link href="https://veltlion.github.io/export-firefox-password/"/>
     <id>https://veltlion.github.io/export-firefox-password/</id>
     <published>2018-06-18T18:36:50.000Z</published>
-    <updated>2021-04-19T16:13:00.000Z</updated>
+    <updated>2021-04-22T15:46:46.906Z</updated>
     
-    <content type="html"><![CDATA[<p>从 Firefox 导出密码有几个方法：</p><ol><li><p>扩展：<a href="https://addons.mozilla.org/firefox/addon/password-exporter">Password Exporter</a></p></li><li><p>软件：<a href="https://github.com/Tiggerito/WebSiteAdvantage.KeePass.Firefox.Importer">Firefox to KeePass Password Importer</a></p></li></ol><span id="more"></span><p>  不过这两个导出之后中文用户名会变成乱码，所以换另一种方法。</p><ol start="3"><li>Chrome 大法<br> a. 首先，关闭我们的过气浏览器 Firefox ，然后打开先进的 Chrome 。<br>  b. 在地址栏输入 <a href="chrome://settings/importData">chrome://settings/importData</a> 回车，选择<code>Mozilla Firefox</code>，勾选<code>已保存的密码</code>，导入。<br>  c. 打开 <a href="chrome://flags/#PasswordExport">chrome://flags/#PasswordExport</a> ，选择<code>Enabled</code>。<br>  d. 打开 <a href="chrome://settings/passwords">chrome://settings/passwords</a> ，点击三点，导出密码。<br>  e. 打开 KeePass 2 ，文件，导入，选择<code>Google Chrome Passwords CSV</code>。</li></ol><p>怎么样，是不是很神奇？</p>]]></content>
+    <content type="html"><![CDATA[<p>从 Firefox 导出密码有几个方法：</p><ol><li><p>扩展：<a href="https://addons.mozilla.org/firefox/addon/password-exporter">Password Exporter</a></p></li><li><p>软件：<a href="https://github.com/Tiggerito/WebSiteAdvantage.KeePass.Firefox.Importer">Firefox to KeePass Password Importer</a></p></li></ol><p>  不过这两个导出之后中文用户名会变成乱码，所以换另一种方法。</p><span id="more"></span><ol start="3"><li>Chrome 大法<br> a. 首先，关闭我们的过气浏览器 Firefox ，然后打开先进的 Chrome 。<br>  b. 在地址栏输入 <a href="chrome://settings/importData">chrome://settings/importData</a> 回车，选择<code>Mozilla Firefox</code>，勾选<code>已保存的密码</code>，导入。<br>  c. 打开 <a href="chrome://flags/#PasswordExport">chrome://flags/#PasswordExport</a> ，选择<code>Enabled</code>。<br>  d. 打开 <a href="chrome://settings/passwords">chrome://settings/passwords</a> ，点击三点，导出密码。<br>  e. 打开 KeePassXC ，文件，导入，选择<code>Google Chrome Passwords CSV</code>。</li></ol><p>怎么样，是不是很神奇？</p>]]></content>
     
     
     <summary type="html">&lt;p&gt;从 Firefox 导出密码有几个方法：&lt;/p&gt;
@@ -60,7 +60,8 @@
 &lt;/li&gt;
 &lt;li&gt;&lt;p&gt;软件：&lt;a href=&quot;https://github.com/Tiggerito/WebSiteAdvantage.KeePass.Firefox.Importer&quot;&gt;Firefox to KeePass Password Importer&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;/ol&gt;</summary>
+&lt;/ol&gt;
+&lt;p&gt;  不过这两个导出之后中文用户名会变成乱码，所以换另一种方法。&lt;/p&gt;</summary>
     
     
     
@@ -545,9 +546,9 @@
     <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
     
     
-    <category term="Hexo" scheme="https://veltlion.github.io/tags/Hexo/"/>
-    
     <category term="重命名" scheme="https://veltlion.github.io/tags/%E9%87%8D%E5%91%BD%E5%90%8D/"/>
+    
+    <category term="Hexo" scheme="https://veltlion.github.io/tags/Hexo/"/>
     
   </entry>
   
