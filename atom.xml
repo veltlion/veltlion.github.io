@@ -546,9 +546,9 @@
     <category term="瞎鼓捣" scheme="https://veltlion.github.io/categories/%E7%9E%8E%E9%BC%93%E6%8D%A3/"/>
     
     
-    <category term="Hexo" scheme="https://veltlion.github.io/tags/Hexo/"/>
-    
     <category term="重命名" scheme="https://veltlion.github.io/tags/%E9%87%8D%E5%91%BD%E5%90%8D/"/>
+    
+    <category term="Hexo" scheme="https://veltlion.github.io/tags/Hexo/"/>
     
   </entry>
   
